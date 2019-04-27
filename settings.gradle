@@ -1,1 +1,1 @@
-include ':xlog', ':sample'
+include ':xlog', ':sample',":flushwriter"
