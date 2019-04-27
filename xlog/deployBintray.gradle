@@ -1,0 +1,17 @@
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = '456838' // bintray.com 用户名
+    groupId = 'com.salton123' // jcenter 上的路径
+    artifactId = 'framework' // 项目名称
+    publishVersion = '1.0.0.0' // 版本号
+    desc = 'https://github.com/LiveSalton/xlog.git' // 描述，不重要
+    website = 'https://github.com/LiveSalton/xlog' // 网站
+}
+
+tasks.withType(Javadoc).all {
+    enabled = false
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
