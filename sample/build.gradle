@@ -27,11 +27,11 @@ android {
 }
 
 dependencies {
-    compile project(':xlog')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:28.0.0'
-    compile 'com.android.support:design:28.0.0'
-    compile 'com.android.support:support-v4:28.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:1.2.71"
-    compile project(":xlog")
+    implementation project(':xlog')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.2.71"
+    implementation project(":xlog")
 }
