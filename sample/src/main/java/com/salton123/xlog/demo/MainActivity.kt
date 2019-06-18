@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import com.salton123.log.XLog
+import kotlinx.android.synthetic.main.aty_main.*
 
 /**
  * User: newSalton@outlook.com
@@ -24,22 +26,27 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
     val permissionsUtil by lazy { PermissionsUtil.with(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.aty_main)
+        tvHello.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+                XLog.i(this,"hello")
+            }
 
-
+        })
         Log.i("MainActivity", "hello")
 
         val storage = arrayOf(PermissionsUtil.Permission.Storage.READ_EXTERNAL_STORAGE,
             PermissionsUtil.Permission.Storage.WRITE_EXTERNAL_STORAGE)
         permissionsUtil.requestCode(1).permissions(*storage).request()
-        Thread {
-            while (true) {
-                XLog.i(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.w(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.v(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.d(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.e(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-            }
-        }.start()
+//        Thread {
+//            while (true) {
+//                XLog.i(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+//                XLog.w(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+//                XLog.v(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+//                XLog.d(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+//                XLog.e(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+//            }
+//        }.start()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

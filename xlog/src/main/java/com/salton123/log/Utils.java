@@ -84,7 +84,7 @@ public class Utils {
         if (obj instanceof String) {
             return (String) obj;
         } else {
-            return obj.getClass().getSimpleName();
+            return obj.getClass().toString();
         }
     }
 
