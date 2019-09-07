@@ -6,7 +6,7 @@
 #define LOG4A_LOGBUFFERHEADER_H
 
 #include <string>
-
+#include <string.h>
 namespace log_header{
     static const char kMagicHeader = '\x11';
 
