@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
-apply from: "deployBintray.gradle"
-
+//apply from: "deployBintray.gradle"
+apply plugin: 'maven'
 android {
     compileSdkVersion "${rootProject.ext.android.compileSdkVersion}" as Integer
     buildToolsVersion "${rootProject.ext.android.buildToolsVersion}"
@@ -18,4 +18,27 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+}
+
+//提交到远程仓库
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //提交到珍爱本地maven仓库：
+            repository(url: "https://repo.rdc.aliyun.com/repository/43441-release-5ZHLZs/") {
+                authentication(userName: "6XCT1E", password: "XldVM4G6IO")
+            }
+            pom.groupId = "com.salton123"
+            pom.artifactId = "log"
+            pom.version = "1.0.0.3"
+        }
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.sourceFiles
+        }
+
+        artifacts {
+            archives androidSourcesJar
+        }
+    }
 }
