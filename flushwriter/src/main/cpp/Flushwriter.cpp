@@ -15,7 +15,7 @@ static void writeDirtyLogToFile(int buffer_fd);
 static AsyncFileFlush *fileFlush = nullptr;
 
 static jlong initNative(JNIEnv *env, jclass type, jstring buffer_path_,
-           jint capacity, jstring log_path_, jboolean compress_) {
+                        jint capacity, jstring log_path_, jboolean compress_) {
     const char *buffer_path = env->GetStringUTFChars(buffer_path_, 0);
     const char *log_path = env->GetStringUTFChars(log_path_, 0);
     size_t buffer_size = static_cast<size_t>(capacity);
@@ -33,14 +33,14 @@ static jlong initNative(JNIEnv *env, jclass type, jstring buffer_path_,
         buffer_ptr = new char[buffer_size];
         map_buffer = false;
     }
-    env->ReleaseStringUTFChars(buffer_path_, buffer_path);
-    env->ReleaseStringUTFChars(log_path_, log_path);
-
     LogBuffer* logBuffer = new LogBuffer(buffer_ptr, buffer_size);
     logBuffer->setAsyncFileFlush(fileFlush);
     //将buffer内的数据清0， 并写入日志文件路径
     logBuffer->initData((char *) log_path, strlen(log_path), compress_);
     logBuffer->map_buffer = map_buffer;
+
+    env->ReleaseStringUTFChars(buffer_path_, buffer_path);
+    env->ReleaseStringUTFChars(log_path_, log_path);
     return reinterpret_cast<long>(logBuffer);
 }
 
@@ -64,7 +64,8 @@ static void writeDirtyLogToFile(int buffer_fd) {
     struct stat fileInfo;
     if(fstat(buffer_fd, &fileInfo) >= 0) {
         size_t buffered_size = static_cast<size_t>(fileInfo.st_size);
-        if(buffered_size > 0) {
+        // buffer_size 必须是大于文件头长度的，否则会导致下标溢出
+        if(buffered_size > LogBufferHeader::calculateHeaderLen(0)) {
             char *buffer_ptr_tmp = (char *) mmap(0, buffered_size, PROT_WRITE | PROT_READ, MAP_SHARED, buffer_fd, 0);
             if (buffer_ptr_tmp != MAP_FAILED) {
                 LogBuffer *tmp = new LogBuffer(buffer_ptr_tmp, buffered_size);
@@ -80,7 +81,7 @@ static void writeDirtyLogToFile(int buffer_fd) {
 }
 
 static void writeNative(JNIEnv *env, jobject instance, jlong ptr,
-            jstring log_) {
+                        jstring log_) {
     const char *log = env->GetStringUTFChars(log_, 0);
     jsize log_len = env->GetStringUTFLength(log_);
     LogBuffer* logBuffer = reinterpret_cast<LogBuffer*>(ptr);
@@ -125,7 +126,7 @@ static JNINativeMethod gMethods[] = {
         {
                 "writeNative",
                 "(JLjava/lang/String;)V",
-                 (void*)writeNative
+                (void*)writeNative
         },
 
         {

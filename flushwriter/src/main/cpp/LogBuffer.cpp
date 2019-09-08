@@ -3,7 +3,7 @@
 //
 
 #include "includes/LogBuffer.h"
-#include "zlib.h"
+
 LogBuffer::LogBuffer(char *ptr, size_t buffer_size):
         buffer_ptr(ptr),
         buffer_size(buffer_size),
