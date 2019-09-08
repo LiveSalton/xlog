@@ -38,15 +38,15 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
         val storage = arrayOf(PermissionsUtil.Permission.Storage.READ_EXTERNAL_STORAGE,
             PermissionsUtil.Permission.Storage.WRITE_EXTERNAL_STORAGE)
         permissionsUtil.requestCode(1).permissions(*storage).request()
-//        Thread {
-//            while (true) {
-//                XLog.i(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-//                XLog.w(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-//                XLog.v(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-//                XLog.d(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-//                XLog.e(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-//            }
-//        }.start()
+        Thread {
+            while (true) {
+                XLog.i(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+                XLog.w(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+                XLog.v(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+                XLog.d(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+                XLog.e(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+            }
+        }.start()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
