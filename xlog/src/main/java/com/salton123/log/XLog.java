@@ -2,8 +2,6 @@ package com.salton123.log;
 
 import android.util.Log;
 
-import com.salton123.log.printer.FilePrinter;
-
 /**
  * User: newSalton@outlook.com
  * Date: 2019/4/26 10:12 PM
@@ -12,11 +10,9 @@ import com.salton123.log.printer.FilePrinter;
  */
 public class XLog {
     private static XLogConfig sConfig = new XLogConfig();
-    private static FilePrinter mFilePrinter = new FilePrinter(sConfig);
 
     public static void config(XLogConfig config) {
         sConfig = config;
-        mFilePrinter = new FilePrinter(sConfig);
     }
 
     /**
@@ -79,7 +75,7 @@ public class XLog {
 
     private static void saveLog(String msg) {
         if (sConfig.isWhetherToSaveLog()) {
-            mFilePrinter.println(0, "", msg);
+
         }
     }
 }
