@@ -76,16 +76,4 @@ public class Utils {
         sb.append(")");
         return sb.toString();
     }
-
-    /**
-     * Returns the obj`s classname
-     */
-    public static String objClassName(Object obj) {
-        if (obj instanceof String) {
-            return (String) obj;
-        } else {
-            return obj.getClass().toString();
-        }
-    }
-
 }

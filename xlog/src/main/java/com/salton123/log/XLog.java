@@ -28,7 +28,7 @@ public class XLog {
         String methodName = Utils.getCallerMethodName();
         String logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName);
         if (sConfig.isDebugable()) {
-            Log.v(Utils.objClassName(tag), logText);
+            Log.v(objClassName(tag), logText);
         }
         saveLog(logText);
     }
@@ -39,7 +39,7 @@ public class XLog {
         String methodName = Utils.getCallerMethodName();
         String logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName);
         if (sConfig.isDebugable()) {
-            Log.d(Utils.objClassName(tag), logText);
+            Log.d(objClassName(tag), logText);
         }
         saveLog(logText);
     }
@@ -50,7 +50,7 @@ public class XLog {
         String methodName = Utils.getCallerMethodName();
         String logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName);
         if (sConfig.isDebugable()) {
-            Log.i(Utils.objClassName(tag), logText);
+            Log.i(objClassName(tag), logText);
         }
         saveLog(logText);
     }
@@ -61,7 +61,7 @@ public class XLog {
         String methodName = Utils.getCallerMethodName();
         String logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName);
         if (sConfig.isDebugable()) {
-            Log.w(Utils.objClassName(tag), logText);
+            Log.w(objClassName(tag), logText);
         }
         saveLog(logText);
     }
@@ -72,7 +72,7 @@ public class XLog {
         String methodName = Utils.getCallerMethodName();
         String logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName);
         if (sConfig.isDebugable()) {
-            Log.e(Utils.objClassName(tag), logText);
+            Log.e(objClassName(tag), logText);
         }
         saveLog(logText);
     }
@@ -82,4 +82,13 @@ public class XLog {
             mFilePrinter.println(0, "", msg);
         }
     }
+
+    public static String objClassName(Object obj) {
+        if (obj instanceof String) {
+            return sConfig.getPrefix() + "-" + (String) obj;
+        } else {
+            return sConfig.getPrefix() + "-" + obj.getClass().toString();
+        }
+    }
+
 }

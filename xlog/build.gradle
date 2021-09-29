@@ -30,7 +30,7 @@ uploadArchives {
             }
             pom.groupId = "com.salton123"
             pom.artifactId = "log"
-            pom.version = "1.0.0.4"
+            pom.version = "1.0.0.5"
         }
         task androidSourcesJar(type: Jar) {
             classifier = 'sources'
