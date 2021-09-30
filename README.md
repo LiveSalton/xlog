@@ -52,3 +52,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 </pre>
+
+### 混淆配置
+```java
+在app/proguard-rules.pro添加如下配置
+-keep class com.salton123.io.**{*;}
+-keep class com.salton123.log.**{*;}
+```
