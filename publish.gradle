@@ -1,0 +1,16 @@
+apply plugin: "com.vanniktech.maven.publish"
+
+mavenPublish {
+    releaseSigningEnabled = false
+    publishing {
+        repositories {
+            maven {
+                credentials {
+                    username '6XCT1E'
+                    password 'XldVM4G6IO'
+                }
+                url 'https://repo.rdc.aliyun.com/repository/43441-release-5ZHLZs/'
+            }
+        }
+    }
+}

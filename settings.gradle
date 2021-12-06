@@ -1,1 +1,28 @@
-include ':xlog', ':sample'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven {
+            url "https://maven.aliyun.com/nexus/content/groups/public"
+        }
+        maven {
+            credentials {
+                username '6XCT1E'
+                password 'XldVM4G6IO'
+            }
+            url 'https://repo.rdc.aliyun.com/repository/43441-release-5ZHLZs/'
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "xlog-sdk"
+include ':sample'
+include ':flushwriter'
+include ':xlog'

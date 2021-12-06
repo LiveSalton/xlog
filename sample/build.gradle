@@ -3,11 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'com.salton123.plugin.codecheck-gradle'
 android {
-    compileSdkVersion "${rootProject.ext.android.compileSdkVersion}" as Integer
-    buildToolsVersion "${rootProject.ext.android.buildToolsVersion}"
+    compileSdk "${rootProject.ext.android.compileSdkVersion}" as Integer
     defaultConfig {
-        minSdkVersion rootProject.ext.android.minSdkVersion as Integer
-        targetSdkVersion rootProject.ext.android.targetSdkVersion as Integer
+        minSdk rootProject.ext.android.minSdkVersion as Integer
+        targetSdk rootProject.ext.android.targetSdkVersion as Integer
         applicationId "com.salton123.xlog.demo"
         versionCode 1
         versionName "1.0"

@@ -2,9 +2,9 @@ package com.salton123.xlog.demo
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.salton123.log.XLog
 import kotlinx.android.synthetic.main.aty_main.*
 
@@ -27,16 +27,17 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_main)
-        tvHello.setOnClickListener(object : View.OnClickListener{
+        tvHello.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                XLog.i(this,"hello")
+                XLog.i(this, "hello")
             }
-
         })
         Log.i("MainActivity", "hello")
 
-        val storage = arrayOf(PermissionsUtil.Permission.Storage.READ_EXTERNAL_STORAGE,
-            PermissionsUtil.Permission.Storage.WRITE_EXTERNAL_STORAGE)
+        val storage = arrayOf(
+            PermissionsUtil.Permission.Storage.READ_EXTERNAL_STORAGE,
+            PermissionsUtil.Permission.Storage.WRITE_EXTERNAL_STORAGE
+        )
         permissionsUtil.requestCode(1).permissions(*storage).request()
         Thread {
             while (true) {

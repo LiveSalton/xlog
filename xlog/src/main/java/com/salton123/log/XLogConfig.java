@@ -8,10 +8,9 @@ package com.salton123.log;
  */
 public class XLogConfig {
     private boolean isDebugable = true;  //日志开关
-    private String prefix = "salton";
-    private String savePath = Utils.getDefaultPath();  //保存位置
+    private String  savePath = Utils.getDefaultPath() ;  //保存位置
     private boolean whetherToSaveLog = false; //是否保存日志
-    private int logDeleteDelayDay = 10;  //默认10天后删除
+    private int  logDeleteDelayDay = 10 ;  //默认10天后删除
     private int logDefaultSplitSize = 5;  //日志拆分大小阈值，每1M拆分
 
     public boolean isDebugable() {
@@ -32,15 +31,6 @@ public class XLogConfig {
 
     public int getLogDefaultSplitSize() {
         return logDefaultSplitSize;
-    }
-
-    public String getPrefix() {
-        return this.prefix;
-    }
-
-    public XLogConfig setPrefix(String prefix) {
-        this.prefix = prefix;
-        return this;
     }
 
     public XLogConfig setDebugable(boolean debugable) {
