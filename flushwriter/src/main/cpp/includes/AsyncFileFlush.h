@@ -2,6 +2,7 @@
 // Created by pqpo on 2017/11/23.
 //
 
+//模版代码的写法 https://www.runoob.com/w3cnote/c-templates-detail.html
 #ifndef LOG4A_FILEFLUSH_H
 #define LOG4A_FILEFLUSH_H
 
