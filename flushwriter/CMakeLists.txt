@@ -16,6 +16,8 @@ aux_source_directory(src/main/cpp/ DIR_LIB_SOURCE)
 add_library (flushwriter SHARED ${DIR_LIB_SOURCE})
 include_directories(src/main/cpp/includes)
 
+message("flush DIR_LIB_SOURCE is ${DIR_LIB_SOURCE}")
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library

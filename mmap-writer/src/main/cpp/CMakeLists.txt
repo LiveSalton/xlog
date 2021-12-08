@@ -3,7 +3,7 @@
 
 # Sets the minimum version of CMake required to build the native library.
 
-cmake_minimum_required(VERSION 3.18.1)
+cmake_minimum_required(VERSION 3.4.1)
 
 # Declares and names the project.
 
@@ -18,19 +18,22 @@ project("writer")
 message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 message("CMAKE_C_FLAGS_RELEASE is ${CMAKE_C_FLAGS_RELEASE}")
+message("CMAKE_CURRENT_SOURCE_DIR is ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # 配置编译参数
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 
-#设置编译源码目录
-aux_source_directory(src/main/cpp/ DIR_LIB_SOURCE)
-
-# 添加动态库
-add_library(writer SHARED ${DIR_LIB_SOURCE})
-
 # 设置h头文件路径
 include_directories(src/main/cpp/includes)
+
+#设置编译源码目录
+aux_source_directory(src/main/cpp/ LIB_SOURCE)
+
+# 添加动态库
+add_library(writer SHARED MmapWriter.cpp)
+
+message("DIR_LIB_SOURCE is ${LIB_SOURCE}")
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
