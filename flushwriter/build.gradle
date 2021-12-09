@@ -20,7 +20,7 @@ android {
         }
     }
 
-    ndkVersion "24.0.7856742"
+//    ndkVersion "24.0.7856742"
     buildTypes {
         release {
             minifyEnabled false

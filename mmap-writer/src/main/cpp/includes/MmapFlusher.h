@@ -7,7 +7,7 @@
 class MmapFlusher {
 public:
     //构造函数
-    MmapFlusher();
+    MmapFlusher(MmapFlusher *buffer);
 
     //析构函数
     ~MmapFlusher();
@@ -20,6 +20,9 @@ public:
 
 private:
     void createThread();
+
+    ssize_t flush();
+
 
 };
 
