@@ -13,10 +13,16 @@ cmake_minimum_required(VERSION 3.4.1)
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 aux_source_directory(src/main/cpp/ DIR_LIB_SOURCE)
-add_library (flushwriter SHARED ${DIR_LIB_SOURCE})
+add_library(flushwriter SHARED ${DIR_LIB_SOURCE})
 include_directories(src/main/cpp/includes)
 
-message("flush DIR_LIB_SOURCE is ${DIR_LIB_SOURCE}")
+##打印目前配置
+#message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+#message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+#message("CMAKE_C_FLAGS_RELEASE is ${CMAKE_C_FLAGS_RELEASE}")
+#message("CMAKE_CURRENT_SOURCE_DIR is ${CMAKE_CURRENT_SOURCE_DIR}")
+#message("DIR_LIB_SOURCE is ${DIR_LIB_SOURCE}")
+
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -25,19 +31,19 @@ message("flush DIR_LIB_SOURCE is ${DIR_LIB_SOURCE}")
 # completing its build.
 
 find_library( # Sets the name of the path variable.
-              log-lib
+        log-lib
 
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       flushwriter
+        flushwriter
 
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib})
