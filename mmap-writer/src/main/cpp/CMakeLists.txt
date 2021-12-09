@@ -28,7 +28,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 include_directories(src/main/cpp/includes)
 
 #设置编译源码目录
-aux_source_directory(src/main/cpp/ LIB_SOURCE)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} LIB_SOURCE)
 
 # 添加动态库
 add_library(writer SHARED MmapWriter.cpp)

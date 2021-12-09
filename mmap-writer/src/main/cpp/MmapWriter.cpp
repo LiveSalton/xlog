@@ -4,12 +4,13 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 static size_t calculateHeaderLength(size_t strlen);
 
 static void writeDirtyDataToFile(int description);
 
-static char *openMmap(int bufferFileDescription, size_t bufferSize)
+static char *openMmap(int bufferFileDescription, size_t bufferSize);
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -63,6 +64,10 @@ Java_com_salton123_writer_MmapWriter_create(
 
 }
 
+size_t calculateHeaderLength(size_t strlen) {
+    return sizeof(char) + sizeof(size_t) + sizeof(size_t) + strlen + sizeof(char);
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buffer_pointer, jstring info) {
@@ -79,10 +84,6 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_destory(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
 
-}
-
-static size_t calculateHeaderLen(size_t log_path_len) {
-    return sizeof(char) + sizeof(size_t) + sizeof(size_t) + log_path_len + sizeof(char);
 }
 
 
