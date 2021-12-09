@@ -7,7 +7,7 @@ package com.salton123.writer
  */
 object MmapWriter {
     init {
-        System.loadLibrary("writer")
+        System.loadLibrary("mmap-writer")
     }
 
     /**

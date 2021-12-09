@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # Declares and names the project.
 
-project("writer")
+project("mmap-writer")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -23,11 +23,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 include_directories(src/main/cpp/includes)
 #设置编译源码目录
 aux_source_directory(src/main/cpp DIR_LIB_SOURCE)
-# 添加动态库
-add_library(writer SHARED ${DIR_LIB_SOURCE})
-
-#aux_source_directory(src/main/cpp/ DIR_LIB_SOURCE)
-#add_library(flushwriter SHARED ${DIR_LIB_SOURCE})
 
 #打印目前配置
 message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
@@ -53,8 +48,11 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
+# 添加动态库
+add_library(mmap-writer SHARED ${DIR_LIB_SOURCE})
+
 target_link_libraries( # Specifies the target library.
-        writer
+        mmap-writer
 
         # Links the target library to the log library
         # included in the NDK.
