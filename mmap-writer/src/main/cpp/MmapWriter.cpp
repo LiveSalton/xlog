@@ -12,7 +12,84 @@ static void writeDirtyDataToFile(int description);
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize);
 
+void flushInfo(jlong buffer_pointer_);
+
 static AsyncFileFlush *fileFlush = nullptr;
+
+static char *openMmap(int bufferFileDescription, size_t bufferSize) {
+    char *mapPointer = nullptr;
+    if (bufferFileDescription != -1) {
+        //写入之前的未曾写入脏数据
+        writeDirtyDataToFile(bufferFileDescription);
+        //根据bufferSize调整buffer文件大小
+        /**
+         * ftruncate()会将参数fd 指定的文件大小改为参数length 指定的大小。
+         * 参数fd 为已打开的文件描述词，而且必须是以写入模式打开的文件。
+         * 如果原来的文件大小比参数length 大，则超过的部分会被删去。
+         */
+        ftruncate(bufferFileDescription, static_cast<int>(bufferSize));
+        /**
+         * 每一个已打开的文件都有一个读写位置, 当打开文件时通常其读写位置是指向文件开头,
+         * 若是以附加的方式打开文件(如O_APPEND), 则读写位置会指向文件尾.
+         * 当read()或write()时, 读写位置会随之增加,lseek()便是用来控制该文件的读写位置.
+         * 参数fildes 为已打开的文件描述词, 参数offset 为根据参数whence来移动读写位置的位移数.
+         *  SEEK_SET 参数offset 即为新的读写位置.
+         *  SEEK_CUR 以目前的读写位置往后增加offset 个位移量.
+         *  SEEK_END 将读写位置指向文件尾后再增加offset 个位移量.
+         *  当whence 值为SEEK_CUR 或 SEEK_END 时, 参数offet 允许负值的出现.
+         */
+        lseek(bufferFileDescription, 0, SEEK_SET);
+        mapPointer = (char *) mmap(0, bufferSize, PROT_WRITE | PROT_READ, MAP_SHARED, bufferFileDescription, 0);
+        if (mapPointer == MAP_FAILED) {
+            mapPointer = nullptr;
+        }
+    }
+    return mapPointer;
+}
+
+/**
+ * 将缓存中的内容写入到文件中
+ * @param bufferFileDescription
+ */
+static void writeDirtyDataToFile(int bufferFileDescription) {
+    struct stat fileInfo;
+    /**
+     *  fstat 用来将参数buffer_fd所指的文件状态，复制到参数fileInfo所指的结构中(struct stat)。
+     *  读取文件基本信息
+     */
+    if (fstat(bufferFileDescription, &fileInfo) >= 0) {
+        //获取文件大小
+        size_t bufferSize = static_cast<size_t>(fileInfo.st_size);
+        // buffer_size 必须是大于文件头长度的，否则会导致下标溢出
+        // 检查文件的大小和记录在文件头的大小信息对比
+        if (bufferSize > calculateHeaderLength(0)) {
+            char *bufferPointerTmp = (char *) mmap(
+                    0, bufferSize,
+                    PROT_WRITE | PROT_READ, MAP_SHARED,
+                    bufferFileDescription, 0);
+            if (bufferPointerTmp != MAP_FAILED) {
+                //写入脏数据
+                LogBuffer *logBufferTmp = new LogBuffer(bufferPointerTmp, bufferSize);
+                //实际写入的数据要比文件限制小
+                size_t dataSize = logBufferTmp->length();
+                if (dataSize > 0) {
+                    logBufferTmp->async_flush(fileFlush, logBufferTmp);
+                } else {
+                    delete logBufferTmp;
+                }
+            }
+        }
+    }
+}
+
+size_t calculateHeaderLength(size_t strlen) {
+    return sizeof(char) + sizeof(size_t) + sizeof(size_t) + strlen + sizeof(char);
+}
+
+void flushInfo(jlong buffer_pointer_) {
+    LogBuffer *logBuffer = reinterpret_cast<LogBuffer *>(buffer_pointer_);
+    logBuffer->async_flush(fileFlush);
+}
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -75,71 +152,37 @@ Java_com_salton123_writer_MmapWriter_create(
     return reinterpret_cast<long>(logBuffer);
 }
 
-size_t calculateHeaderLength(size_t strlen) {
-    return sizeof(char) + sizeof(size_t) + sizeof(size_t) + strlen + sizeof(char);
-}
+
+
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buffer_pointer, jstring info) {
-
+Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buffer_pointer_, jstring info_) {
+    const char *info = env->GetStringUTFChars(info_, 0);
+    jsize infoLength = env->GetStringUTFLength(info_);
+    LogBuffer *logBuffer = reinterpret_cast<LogBuffer *>(buffer_pointer_);
+    if (infoLength >= logBuffer->emptySize()) {
+        logBuffer->async_flush(fileFlush);
+    }
+    logBuffer->append(info, infoLength);
+    env->ReleaseStringUTFChars(info_, info);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_flush(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
-
+    flushInfo(buffer_pointer);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_destory(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
-
-}
-
-
-static char *openMmap(int bufferFileDescription, size_t bufferSize) {
-    char *mapPointer = nullptr;
-    if (bufferFileDescription != -1) {
-        //写入之前的未曾写入脏数据
-        writeDirtyDataToFile(bufferFileDescription);
-        //根据bufferSize调整buffer文件大小
-        /**
-         * ftruncate()会将参数fd 指定的文件大小改为参数length 指定的大小。
-         * 参数fd 为已打开的文件描述词，而且必须是以写入模式打开的文件。
-         * 如果原来的文件大小比参数length 大，则超过的部分会被删去。
-         */
-        ftruncate(bufferFileDescription, static_cast<int>(bufferSize));
-        /**
-         * 每一个已打开的文件都有一个读写位置, 当打开文件时通常其读写位置是指向文件开头,
-         * 若是以附加的方式打开文件(如O_APPEND), 则读写位置会指向文件尾.
-         * 当read()或write()时, 读写位置会随之增加,lseek()便是用来控制该文件的读写位置.
-         * 参数fildes 为已打开的文件描述词, 参数offset 为根据参数whence来移动读写位置的位移数.
-         *  SEEK_SET 参数offset 即为新的读写位置.
-         *  SEEK_CUR 以目前的读写位置往后增加offset 个位移量.
-         *  SEEK_END 将读写位置指向文件尾后再增加offset 个位移量.
-         *  当whence 值为SEEK_CUR 或 SEEK_END 时, 参数offet 允许负值的出现.
-         */
-        lseek(bufferFileDescription, 0, SEEK_SET);
-        mapPointer = (char *) mmap(0, bufferSize, PROT_WRITE | PROT_READ, MAP_SHARED, bufferFileDescription, 0);
-        if (mapPointer == MAP_FAILED) {
-            mapPointer = nullptr;
-        }
+    flushInfo(buffer_pointer);
+    if (fileFlush != nullptr) {
+        delete fileFlush;
     }
-    return mapPointer;
+    fileFlush = nullptr;
 }
 
-static void writeDirtyDataToFile(int bufferFileDescription) {
-    struct stat fileInfo;
-    /**
-     *  fstat 用来将参数buffer_fd所指的文件状态，复制到参数fileInfo所指的结构中(struct stat)。
-     */
-    if (fstat(bufferFileDescription, &fileInfo) >= 0) {
-        size_t bufferSize = static_cast<size_t>(fileInfo.st_size);
-        // buffer_size 必须是大于文件头长度的，否则会导致下标溢出
-        if (bufferSize > calculateHeaderLength(0)) {
-        }
-    }
-}
 
 
