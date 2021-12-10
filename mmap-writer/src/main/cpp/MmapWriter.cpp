@@ -4,12 +4,15 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <LogBuffer.h>
 
 static size_t calculateHeaderLength(size_t strlen);
 
 static void writeDirtyDataToFile(int description);
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize);
+
+static AsyncFileFlush *fileFlush = nullptr;
 
 extern "C"
 JNIEXPORT jlong JNICALL
@@ -51,7 +54,7 @@ Java_com_salton123_writer_MmapWriter_create(
      * S_IWOTH：其他组写权限
      */
     int bufferFileDescription = open(bufferPath, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-
+    // buffer 的第一个字节会用于存储日志路径名称长度，后面紧跟日志路径，之后才是日志信息
     bufferSize = bufferSize + calculateHeaderLength(strlen(savePath));
     char *mMap = openMmap(bufferFileDescription, bufferSize);
     bool enableMmap = true;
@@ -60,7 +63,16 @@ Java_com_salton123_writer_MmapWriter_create(
         mMap = new char[bufferSize];
         enableMmap = false;
     }
-
+    if (fileFlush == nullptr) {
+        fileFlush = new AsyncFileFlush();
+    }
+    LogBuffer *logBuffer = new LogBuffer(mMap, bufferSize);
+    logBuffer->setAsyncFileFlush(fileFlush);
+    //将buffer内的数据清0， 并写入日志文件路径
+    logBuffer->initData((char *) savePath, strlen(savePath), compress);
+    logBuffer->map_buffer = enableMmap;
+    env->ReleaseStringUTFChars(save_path, savePath);
+    return reinterpret_cast<long>(logBuffer);
 }
 
 size_t calculateHeaderLength(size_t strlen) {

@@ -2,9 +2,9 @@ package com.salton123.log.printer;
 
 import android.util.Log;
 
-import com.salton123.io.FlushWriter;
 import com.salton123.log.Utils;
 import com.salton123.log.XLogConfig;
+import com.salton123.writer.MmapWriter;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -60,7 +60,7 @@ public class FilePrinter implements Printer {
             long fileLength = logFile.length();
             long fileSize = fileLength >>> 20;    //转为m
             Log.i(TAG, "fileLength:" + fileLength + ",fileSize:"
-                    + fileSize + ",logDefaultSplitSize:" + logDefaultSplitSize);
+                + fileSize + ",logDefaultSplitSize:" + logDefaultSplitSize);
 
             if (fileSize >= logDefaultSplitSize) {
                 //删除大于10天的文件
@@ -72,7 +72,7 @@ public class FilePrinter implements Printer {
                 String fileExt = simpleDateFormate.format(new Date());
                 StringBuilder sb = new StringBuilder(path);
                 sb.append(File.separator).append(fileName).append(fileExt)
-                        .append(bakExt);
+                    .append(bakExt);
                 File fileNameTo = new File(sb.toString());
                 logFile.renameTo(fileNameTo);
                 mWriter.open(path, fileName);
@@ -112,7 +112,7 @@ public class FilePrinter implements Printer {
     private static class Writer {
         String lastFileName = null;
         File file = null;
-        FlushWriter logBuffer = null;
+        Long logBuffer = null;
 
         public boolean isOpened() {
             return logBuffer != null;
@@ -136,8 +136,8 @@ public class FilePrinter implements Printer {
                 }
             }
             try {
-                logBuffer = new FlushWriter(file.getAbsolutePath() + "_buf",
-                        8192 * 2, file.getAbsolutePath(), false);
+                logBuffer = MmapWriter.INSTANCE.create(file.getAbsolutePath(),
+                    8192 * 2, false);
             } catch (Exception e) {
                 e.printStackTrace();
                 lastFileName = null;
@@ -150,7 +150,7 @@ public class FilePrinter implements Printer {
         private boolean close() {
             if (logBuffer != null) {
                 try {
-                    logBuffer.release();
+                    MmapWriter.INSTANCE.destory(logBuffer);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
@@ -165,8 +165,8 @@ public class FilePrinter implements Printer {
 
         private void appendLog(String flattenedLog) {
             try {
-                logBuffer.write(flattenedLog);
-                logBuffer.flushAsync();
+                MmapWriter.INSTANCE.write(logBuffer, flattenedLog);
+                MmapWriter.INSTANCE.flush(logBuffer);
             } catch (Exception e) {
                 e.printStackTrace();
             }
