@@ -18,6 +18,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api project(":flushwriter")
+//    api project(":flushwriter")
     api project(":mmap-writer")
 }

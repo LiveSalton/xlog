@@ -24,6 +24,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "xlog-sdk"
 include ':sample'
-include ':flushwriter'
+//include ':flushwriter'
 include ':xlog'
 include ':mmap-writer'
