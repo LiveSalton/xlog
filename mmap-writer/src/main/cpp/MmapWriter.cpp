@@ -152,9 +152,6 @@ Java_com_salton123_writer_MmapWriter_create(
     return reinterpret_cast<long>(logBuffer);
 }
 
-
-
-
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buffer_pointer_, jstring info_) {

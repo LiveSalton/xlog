@@ -1,6 +1,7 @@
 package com.salton123.log;
 
 import android.os.Environment;
+import android.text.TextUtils;
 
 import java.io.File;
 
@@ -24,8 +25,7 @@ public class Utils {
      * Check whether sdcard is availale
      */
     public static boolean checkSDCardAvailable() {
-        return Environment.getExternalStorageState()
-                .equals(Environment.MEDIA_MOUNTED);
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
     /**
@@ -53,9 +53,9 @@ public class Utils {
      * Returns the format log String which prepare for save in file
      */
     public static String msgForTextLog(
-            Object obj, String filename,
-            int line, String msg,
-            String methodName) {
+        Object obj, String filename,
+        int line, String msg,
+        String methodName) {
         StringBuilder sb = new StringBuilder(msg);
         // sb.append("(P:");
         // sb.append(Process.myPid());
@@ -86,6 +86,36 @@ public class Utils {
         } else {
             return obj.getClass().getSimpleName();
         }
+    }
+
+    public static boolean makeDirs(String filePath) {
+        String folderName = getFolderName(filePath);
+        if (isEmpty(folderName)) {
+            return false;
+        }
+
+        File folder = new File(folderName);
+        return (folder.exists() && folder.isDirectory()) ? true : folder.mkdirs();
+    }
+
+    public static boolean isEmpty(CharSequence str) {
+        return (str == null || str.length() == 0);
+    }
+
+    /**
+     * get folder name from path
+     *
+     * @param filePath 文件路径
+     * @return 文件夹名称
+     */
+    public static String getFolderName(String filePath) {
+
+        if (TextUtils.isEmpty(filePath)) {
+            return filePath;
+        }
+
+        int filePosi = filePath.lastIndexOf(File.separator);
+        return (filePosi == -1) ? "" : filePath.substring(0, filePosi);
     }
 
 }

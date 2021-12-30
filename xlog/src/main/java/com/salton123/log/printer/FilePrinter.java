@@ -59,8 +59,7 @@ public class FilePrinter implements Printer {
         } else {
             long fileLength = logFile.length();
             long fileSize = fileLength >>> 20;    //转为m
-            Log.i(TAG, "fileLength:" + fileLength + ",fileSize:"
-                + fileSize + ",logDefaultSplitSize:" + logDefaultSplitSize);
+            Log.i(TAG, "fileLength:" + fileLength + ",fileSize:" + fileSize + ",logDefaultSplitSize:" + logDefaultSplitSize);
 
             if (fileSize >= logDefaultSplitSize) {
                 //删除大于10天的文件

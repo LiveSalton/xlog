@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.salton123.log.Utils
 import com.salton123.log.XLog
-import kotlinx.android.synthetic.main.aty_main.*
+import java.io.File
+import kotlinx.android.synthetic.main.aty_main.tvHello
 
 /**
  * User: newSalton@outlook.com
@@ -30,6 +32,11 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
         tvHello.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 XLog.i(this, "hello")
+                val file = File(Utils.getDefaultPath() + packageName)
+                if (!file.exists()) {
+                    val ret = file.parentFile.mkdirs()
+                    XLog.i(this, "ret:$ret")
+                }
             }
         })
         Log.i("MainActivity", "hello")
@@ -41,11 +48,12 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
         permissionsUtil.requestCode(1).permissions(*storage).request()
         Thread {
             while (true) {
-                XLog.i(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.w(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.v(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.d(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
-                XLog.e(this, "MainActivityMainActivityMainActivityMainActivityMainActivityhello")
+                XLog.i("MainActivity", "MainActivity hello")
+//                Thread.sleep(1000)
+                XLog.w(this, "MainActivityhello")
+                XLog.v(this, "MainActivityhello")
+                XLog.d(this, "MainActivityhello")
+                XLog.e(this, "MainActivityhello")
             }
         }.start()
     }
