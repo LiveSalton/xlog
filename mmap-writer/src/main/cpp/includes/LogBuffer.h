@@ -57,7 +57,7 @@ private:
     size_t buffer_size = 0;
     std::recursive_mutex log_mtx;
 
-    MetaData logHeader;
+    MetaData metaData;
     z_stream zStream;
     bool is_compress = false;
 

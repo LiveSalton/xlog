@@ -9,11 +9,11 @@
 LogBuffer::LogBuffer(char *ptr, size_t buffer_size):
         buffer_ptr(ptr),
         buffer_size(buffer_size),
-        logHeader(buffer_ptr, buffer_size) {
-    if (logHeader.isAvailable()) {
-        data_ptr = (char *) logHeader.metaPointer();
-        write_ptr = (char *) logHeader.writePointer();
-        if(logHeader.isCompressed()) {
+        metaData(buffer_ptr, buffer_size) {
+    if (metaData.isAvailable()) {
+        data_ptr = (char *) metaData.metaPointer();
+        write_ptr = (char *) metaData.writePointer();
+        if(metaData.isCompressed()) {
             initCompress(true);
         }
         char* log_path = getLogPath();
@@ -34,7 +34,7 @@ size_t LogBuffer::length() {
 }
 
 void LogBuffer::setLength(size_t len) {
-    logHeader.setLogLength(len);
+    metaData.setLogLength(len);
 }
 
 size_t LogBuffer::append(const char *log, size_t len) {
@@ -138,17 +138,17 @@ void LogBuffer::initData(char *log_path, size_t log_path_len, bool is_compress) 
     header.logLength = 0;
     header.compressed = is_compress;
 
-    logHeader.init(header);
+    metaData.init(header);
     initCompress(is_compress);
 
-    data_ptr = (char *) logHeader.metaPointer();
-    write_ptr = (char *) logHeader.writePointer();
+    data_ptr = (char *) metaData.metaPointer();
+    write_ptr = (char *) metaData.writePointer();
 
     openSetLogFile(log_path);
 }
 
 char *LogBuffer::getLogPath() {
-    return logHeader.getLogPath();
+    return metaData.getLogPath();
 }
 
 bool LogBuffer::initCompress(bool compress) {
