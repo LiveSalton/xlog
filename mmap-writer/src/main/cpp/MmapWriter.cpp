@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <LogBuffer.h>
+#include <FileBuffer.h>
 
 static size_t calculateHeaderLength(size_t strlen);
 
@@ -69,11 +69,11 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
                     bufferFileDescription, 0);
             if (bufferPointerTmp != MAP_FAILED) {
                 //写入脏数据
-                LogBuffer *logBufferTmp = new LogBuffer(bufferPointerTmp, bufferSize);
+                FileBuffer *logBufferTmp = new FileBuffer(bufferPointerTmp, bufferSize);
                 //实际写入的数据要比文件限制小
-                size_t dataSize = logBufferTmp->length();
+                size_t dataSize = logBufferTmp->getLogLength();
                 if (dataSize > 0) {
-                    logBufferTmp->async_flush(fileFlush, logBufferTmp);
+                    logBufferTmp->asyncFlush(fileFlush, logBufferTmp);
                 } else {
                     delete logBufferTmp;
                 }
@@ -87,8 +87,8 @@ size_t calculateHeaderLength(size_t strlen) {
 }
 
 void flushInfo(jlong buffer_pointer_) {
-    LogBuffer *logBuffer = reinterpret_cast<LogBuffer *>(buffer_pointer_);
-    logBuffer->async_flush(fileFlush);
+    FileBuffer *logBuffer = reinterpret_cast<FileBuffer *>(buffer_pointer_);
+    logBuffer->asyncFlush(fileFlush, nullptr);
 }
 
 extern "C"
@@ -143,11 +143,11 @@ Java_com_salton123_writer_MmapWriter_create(
     if (fileFlush == nullptr) {
         fileFlush = new AsyncFileFlush();
     }
-    LogBuffer *logBuffer = new LogBuffer(mMap, bufferSize);
+    FileBuffer *logBuffer = new FileBuffer(mMap, bufferSize);
     logBuffer->setAsyncFileFlush(fileFlush);
     //将buffer内的数据清0， 并写入日志文件路径
-    logBuffer->initData((char *) savePath, strlen(savePath), compress);
-    logBuffer->map_buffer = enableMmap;
+    logBuffer->init((char *) savePath, strlen(savePath), compress);
+    logBuffer->enableMmap = enableMmap;
     env->ReleaseStringUTFChars(save_path, savePath);
     return reinterpret_cast<long>(logBuffer);
 }
@@ -157,9 +157,9 @@ JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buffer_pointer_, jstring info_) {
     const char *info = env->GetStringUTFChars(info_, 0);
     jsize infoLength = env->GetStringUTFLength(info_);
-    LogBuffer *logBuffer = reinterpret_cast<LogBuffer *>(buffer_pointer_);
+    FileBuffer *logBuffer = reinterpret_cast<FileBuffer *>(buffer_pointer_);
     if (infoLength >= logBuffer->emptySize()) {
-        logBuffer->async_flush(fileFlush);
+        logBuffer->asyncFlush(fileFlush, nullptr);
     }
     logBuffer->append(info, infoLength);
     env->ReleaseStringUTFChars(info_, info);
