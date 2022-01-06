@@ -14,7 +14,7 @@ namespace log_header {
     static const char metaMagic = '\x11';
 
     struct Meta {
-        char magic;
+        char magic = metaMagic;
         size_t logLength;
         size_t logPathLength;
         char *logPath;
