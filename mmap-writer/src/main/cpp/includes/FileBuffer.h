@@ -36,12 +36,9 @@ public:
 
     size_t emptySize();
 
-
     void setAsyncFileFlush(AsyncFileFlush *flush);
 
     void asyncFlush(AsyncFileFlush *flush, void *releaseThis);
-
-    void release();
 
 public:
     bool enableMmap = true;

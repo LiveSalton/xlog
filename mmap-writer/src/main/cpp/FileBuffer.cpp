@@ -122,22 +122,6 @@ void FileBuffer::clear() {
     updateLogLength(getLogLength());
 }
 
-
-void FileBuffer::release() {
-    std::lock_guard<std::recursive_mutex> lock_release(logMutex);
-    if (compressed && Z_NULL != zStream.state) {
-        deflateEnd(&zStream);
-    }
-    if (enableMmap) {
-        munmap(_bufferPointer, _bufferSize);
-    } else {
-        delete[] _bufferPointer;
-    }
-    if (_logFile != nullptr) {
-        fclose(_logFile);
-    }
-}
-
 void FileBuffer::setAsyncFileFlush(AsyncFileFlush *flush) {
     asyncFileFlush = flush;
 }
@@ -163,3 +147,15 @@ void FileBuffer::asyncFlush(AsyncFileFlush *flush, void *releaseThis) {
         delete releaseThis;
     }
 }
+
+bool FileBuffer::openLogFile(const char *log_path) {
+    if (log_path != nullptr) {
+        FILE* _file_log = fopen(log_path, "ab+");
+        if(_file_log != NULL) {
+            _logFile = _file_log;
+            return true;
+        }
+    }
+    return false;
+}
+
