@@ -11,9 +11,9 @@ LogBuffer::LogBuffer(char *ptr, size_t buffer_size):
         buffer_size(buffer_size),
         logHeader(buffer_ptr, buffer_size) {
     if (logHeader.isAvailable()) {
-        data_ptr = (char *) logHeader.ptr();
-        write_ptr = (char *) logHeader.write_ptr();
-        if(logHeader.getIsCompress()) {
+        data_ptr = (char *) logHeader.metaPointer();
+        write_ptr = (char *) logHeader.writePointer();
+        if(logHeader.isCompressed()) {
             initCompress(true);
         }
         char* log_path = getLogPath();
@@ -34,7 +34,7 @@ size_t LogBuffer::length() {
 }
 
 void LogBuffer::setLength(size_t len) {
-    logHeader.setLogLen(len);
+    logHeader.setLogLength(len);
 }
 
 size_t LogBuffer::append(const char *log, size_t len) {
@@ -131,18 +131,18 @@ void LogBuffer::initData(char *log_path, size_t log_path_len, bool is_compress) 
     std::lock_guard<std::recursive_mutex> lck_release(log_mtx);
     memset(buffer_ptr, '\0', buffer_size);
 
-    log_header::Header header;
+    log_header::Meta header;
     header.magic = kMagicHeader;
-    header.log_path_len = log_path_len;
-    header.log_path = log_path;
-    header.log_len = 0;
-    header.isCompress = is_compress;
+    header.logPathLength = log_path_len;
+    header.logPath = log_path;
+    header.logLength = 0;
+    header.compressed = is_compress;
 
-    logHeader.initHeader(header);
+    logHeader.init(header);
     initCompress(is_compress);
 
-    data_ptr = (char *) logHeader.ptr();
-    write_ptr = (char *) logHeader.write_ptr();
+    data_ptr = (char *) logHeader.metaPointer();
+    write_ptr = (char *) logHeader.writePointer();
 
     openSetLogFile(log_path);
 }

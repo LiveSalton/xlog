@@ -17,6 +17,7 @@
 #include "AsyncFileFlush.h"
 #include "FlushBuffer.h"
 #include "LogBufferHeader.h"
+#include "Metadata.h"
 #include <zlib.h>
 
 using namespace log_header;
@@ -56,7 +57,7 @@ private:
     size_t buffer_size = 0;
     std::recursive_mutex log_mtx;
 
-    LogBufferHeader logHeader;
+    MetaData logHeader;
     z_stream zStream;
     bool is_compress = false;
 
