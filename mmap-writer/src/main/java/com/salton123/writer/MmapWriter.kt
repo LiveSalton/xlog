@@ -15,6 +15,7 @@ object MmapWriter {
      * @param savePath 文件保存路径
      * @param savePath mmap缓存容量，大于容量就会写入到文件中。
      * @param compress 是否用zlib压缩
+     * @return mmap指针
      */
     external fun create(savePath: String, capacity: Int, compress: Boolean): Long
 
