@@ -129,7 +129,7 @@ bool MetaData::isAvailable() {
  * 第四个放_logPathLength
  * 第五个放compressed
  */
-size_t MetaData::metaLength(size_t _logPathLength) {
+ size_t MetaData::metaLength(size_t _logPathLength) {
     return sizeof(char) + sizeof(size_t) + sizeof(size_t) + _logPathLength + sizeof(char);
 }
 

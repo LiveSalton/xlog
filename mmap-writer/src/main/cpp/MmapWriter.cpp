@@ -12,15 +12,13 @@
 #include <sys/stat.h>
 #include <FileBuffer.h>
 
-static size_t calculateHeaderLength(size_t strlen);
-
 static void writeDirtyDataToFile(int description);
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize);
 
 void flushInfo(jlong buffer_pointer_);
 
-static FileDifferential *fileFlush = nullptr;
+static FileDifferential *fileDifferential = nullptr;
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize) {
     char *mapPointer = nullptr;
@@ -68,7 +66,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
         size_t bufferSize = static_cast<size_t>(fileInfo.st_size);
         // buffer_size 必须是大于文件头长度的，否则会导致下标溢出
         // 检查文件的大小和记录在文件头的大小信息对比
-        if (bufferSize > calculateHeaderLength(0)) {
+        if (bufferSize > MetaData::metaLength(0)) {
             char *bufferPointerTmp = (char *) mmap(
                     0, bufferSize,
                     PROT_WRITE | PROT_READ, MAP_SHARED,
@@ -79,7 +77,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
                 //实际写入的数据要比文件限制小
                 size_t dataSize = logBufferTmp->getLogLength();
                 if (dataSize > 0) {
-                    logBufferTmp->asyncFlush(fileFlush, logBufferTmp);
+                    logBufferTmp->asyncFlush(fileDifferential, logBufferTmp);
                 } else {
                     delete logBufferTmp;
                 }
@@ -88,13 +86,10 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
     }
 }
 
-size_t calculateHeaderLength(size_t strlen) {
-    return sizeof(char) + sizeof(size_t) + sizeof(size_t) + strlen + sizeof(char);
-}
 
 void flushInfo(jlong buffer_pointer_) {
     FileBuffer *logBuffer = reinterpret_cast<FileBuffer *>(buffer_pointer_);
-    logBuffer->asyncFlush(fileFlush, nullptr);
+    logBuffer->asyncFlush(fileDifferential, nullptr);
 }
 
 extern "C"
@@ -138,7 +133,7 @@ Java_com_salton123_writer_MmapWriter_create(
      */
     int bufferFileDescription = open(bufferPath, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     // buffer 的第一个字节会用于存储日志路径名称长度，后面紧跟日志路径，之后才是日志信息
-    bufferSize = bufferSize + calculateHeaderLength(strlen(savePath));
+    bufferSize = bufferSize + MetaData::metaLength(strlen(savePath));
     char *mMap = openMmap(bufferFileDescription, bufferSize);
     bool enableMmap = true;
     //如果打开 mmap 失败，则降级使用内存缓存
@@ -146,11 +141,11 @@ Java_com_salton123_writer_MmapWriter_create(
         mMap = new char[bufferSize];
         enableMmap = false;
     }
-    if (fileFlush == nullptr) {
-        fileFlush = new FileDifferential();
+    if (fileDifferential == nullptr) {
+        fileDifferential = new FileDifferential();
     }
     FileBuffer *logBuffer = new FileBuffer(mMap, bufferSize);
-    logBuffer->setAsyncFileFlush(fileFlush);
+    logBuffer->setAsyncFileFlush(fileDifferential);
     //将buffer内的数据清0， 并写入日志文件路径
     logBuffer->init((char *) savePath, strlen(savePath), compress);
     logBuffer->enableMmap = enableMmap;
@@ -165,7 +160,7 @@ Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buff
     jsize infoLength = env->GetStringUTFLength(info_);
     FileBuffer *logBuffer = reinterpret_cast<FileBuffer *>(buffer_pointer_);
     if (infoLength >= logBuffer->emptySize()) {
-        logBuffer->asyncFlush(fileFlush, nullptr);
+        logBuffer->asyncFlush(fileDifferential, nullptr);
     }
     logBuffer->append(info, infoLength);
     env->ReleaseStringUTFChars(info_, info);
@@ -181,10 +176,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_destory(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
     flushInfo(buffer_pointer);
-    if (fileFlush != nullptr) {
-        delete fileFlush;
+    if (fileDifferential != nullptr) {
+        delete fileDifferential;
     }
-    fileFlush = nullptr;
+    fileDifferential = nullptr;
 }
 
 
