@@ -34,8 +34,8 @@ void FileDifferential::asyncThreadTask() {
     }
 }
 
-bool FileDifferential::run(FlushBuffer *flushBuffer) {
-    std::unique_lock <std::mutex> lck_async_flush(asyncMutex);
+bool FileDifferential::asyncFlush(FlushBuffer *flushBuffer) {
+    std::unique_lock<std::mutex> lck_async_flush(asyncMutex);
     if (isExited) {
         delete flushBuffer;
         return false;
@@ -44,14 +44,15 @@ bool FileDifferential::run(FlushBuffer *flushBuffer) {
     asyncBuffer.push_back(flushBuffer);
     //唤醒所有的等待(wait)线程。如果当前没有等待线程，则该函数什么也不做
     asyncCondition.notify_all();
+    return true;
 }
 
 ssize_t FileDifferential::flush(FlushBuffer *flushBuffer) {
     ssize_t written = 0;
-    FILE *log_file = flushBuffer->logFile();
-    if (log_file != nullptr && flushBuffer->length() > 0) {
-        written = fwrite(flushBuffer->ptr(), flushBuffer->length(), 1, log_file);
-        fflush(log_file);
+    FILE *logFile = flushBuffer->logFile();
+    if (logFile != nullptr && flushBuffer->length() > 0) {
+        written = fwrite(flushBuffer->ptr(), flushBuffer->length(), 1, logFile);
+        fflush(logFile);
     }
     delete flushBuffer;
     return written;

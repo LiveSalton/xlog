@@ -15,7 +15,7 @@
 #include<vector>
 #include <mutex>
 #include <condition_variable>
-#include "AsyncFileFlush.h"
+#include "FileDifferential.h"
 #include "FlushBuffer.h"
 #include "Metadata.h"
 #include <zlib.h>
@@ -36,9 +36,9 @@ public:
 
     size_t emptySize();
 
-    void setAsyncFileFlush(AsyncFileFlush *flush);
+    void setAsyncFileFlush(FileDifferential *flush);
 
-    void asyncFlush(AsyncFileFlush *flush, void *releaseThis);
+    void asyncFlush(FileDifferential *flush, void *releaseThis);
 
 public:
     bool enableMmap = true;
@@ -54,7 +54,7 @@ private:
 
     FILE *_logFile = nullptr;
 
-    AsyncFileFlush *asyncFileFlush = nullptr;
+    FileDifferential *asyncFileFlush = nullptr;
 
     char *const _bufferPointer = nullptr;
 

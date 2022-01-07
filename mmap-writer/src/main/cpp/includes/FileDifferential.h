@@ -21,7 +21,7 @@ public:
 
     ~FileDifferential();
 
-    bool run(FlushBuffer *flushBuffer);
+    bool asyncFlush(FlushBuffer *flushBuffer);
 
 private:
     void asyncThreadTask();

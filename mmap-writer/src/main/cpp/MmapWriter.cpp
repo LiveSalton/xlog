@@ -14,7 +14,7 @@ static char *openMmap(int bufferFileDescription, size_t bufferSize);
 
 void flushInfo(jlong buffer_pointer_);
 
-static AsyncFileFlush *fileFlush = nullptr;
+static FileDifferential *fileFlush = nullptr;
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize) {
     char *mapPointer = nullptr;
@@ -141,7 +141,7 @@ Java_com_salton123_writer_MmapWriter_create(
         enableMmap = false;
     }
     if (fileFlush == nullptr) {
-        fileFlush = new AsyncFileFlush();
+        fileFlush = new FileDifferential();
     }
     FileBuffer *logBuffer = new FileBuffer(mMap, bufferSize);
     logBuffer->setAsyncFileFlush(fileFlush);
