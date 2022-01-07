@@ -1,3 +1,9 @@
+/**
+ * Time:2022/1/6 11:01
+ * Author:
+ * Description: 基于mmap的文本写入器
+ */
+
 #include <jni.h>
 #include <string>
 #include <fcntl.h>
