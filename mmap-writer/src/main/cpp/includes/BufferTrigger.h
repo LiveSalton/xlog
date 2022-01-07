@@ -1,11 +1,12 @@
 /**
  * Time:2022/1/6 11:01
  * Author:
- * Description:
+ * Description: 缓冲触发器，mmap共享空间写满后，把内容转写到文件。
+ * 协调mmap高速缓存和文件流之间的速度差异
  */
 
-#ifndef XLOG_SDK_FILEBUFFER_H
-#define XLOG_SDK_FILEBUFFER_H
+#ifndef XLOG_SDK_BUFFERTRIGGER_H
+#define XLOG_SDK_BUFFERTRIGGER_H
 
 #include <string>
 #include <math.h>
@@ -20,13 +21,13 @@
 #include "Metadata.h"
 #include <zlib.h>
 
-using namespace log_header;
+using namespace space_mmap_writer;
 
-class FileBuffer {
+class BufferTrigger {
 public:
-    FileBuffer(char *dataPointer, size_t bufferSize);
+    BufferTrigger(char *dataPointer, size_t bufferSize);
 
-    ~FileBuffer();
+    ~BufferTrigger();
 
     void init(char *logPath, size_t logPathLength, bool compressed);
 
@@ -71,4 +72,4 @@ private:
     bool compressed = false;
 };
 
-#endif //XLOG_SDK_FILEBUFFER_H
+#endif //XLOG_SDK_BUFFERTRIGGER_H

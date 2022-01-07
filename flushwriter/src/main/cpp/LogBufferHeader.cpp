@@ -5,7 +5,7 @@
 #include <ctime>
 #include "LogBufferHeader.h"
 
-using namespace log_header;
+using namespace space_mmap_writer;
 
 //struct Header {
 //    char magic;

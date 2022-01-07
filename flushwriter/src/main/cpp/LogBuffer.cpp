@@ -129,7 +129,7 @@ void LogBuffer::initData(char *log_path, size_t log_path_len, bool is_compress) 
     std::lock_guard<std::recursive_mutex> lck_release(log_mtx);
     memset(buffer_ptr, '\0', buffer_size);
 
-    log_header::Header header;
+    space_mmap_writer::Header header;
     header.magic = kMagicHeader;
     header.log_path_len = log_path_len;
     header.log_path = log_path;

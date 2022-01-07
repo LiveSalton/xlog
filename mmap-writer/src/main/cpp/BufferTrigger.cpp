@@ -4,9 +4,9 @@
  * Description: 文件缓存层(filename_buf)
  */
 
-#include "includes/FileBuffer.h"
+#include "includes/BufferTrigger.h"
 
-FileBuffer::FileBuffer(char *dataPointer, size_t bufferSize) :
+BufferTrigger::BufferTrigger(char *dataPointer, size_t bufferSize) :
         _bufferPointer(dataPointer),
         _bufferSize(bufferSize),
         metaData(_bufferPointer, _bufferSize) {
@@ -28,7 +28,7 @@ FileBuffer::FileBuffer(char *dataPointer, size_t bufferSize) :
     memset(&zStream, 0, sizeof(zStream));
 }
 
-FileBuffer::~FileBuffer() {
+BufferTrigger::~BufferTrigger() {
     std::lock_guard<std::recursive_mutex> lck_release(logMutex);
     if (compressed && Z_NULL != zStream.state) {
         deflateEnd(&zStream);
@@ -43,19 +43,19 @@ FileBuffer::~FileBuffer() {
     }
 }
 
-size_t FileBuffer::getLogLength() {
+size_t BufferTrigger::getLogLength() {
     return _writerPointer - _dataPointer;
 }
 
-void FileBuffer::updateLogLength(size_t length) {
+void BufferTrigger::updateLogLength(size_t length) {
     metaData.setLogLength(length);
 }
 
-void FileBuffer::init(char *logPath, size_t logPathLength, bool compressed) {
+void BufferTrigger::init(char *logPath, size_t logPathLength, bool compressed) {
     //简化上锁解锁代码
     std::lock_guard<std::recursive_mutex> lock_release(logMutex);
     memset(_bufferPointer, '\0', _bufferSize);
-    log_header::Meta meta;
+    space_mmap_writer::Meta meta;
     meta.magic = metaMagic;
     meta.logPathLength = logPathLength;
     meta.logPath = logPath;
@@ -70,7 +70,7 @@ void FileBuffer::init(char *logPath, size_t logPathLength, bool compressed) {
     openLogFile(logPath);
 }
 
-size_t FileBuffer::append(const char *log, size_t length) {
+size_t BufferTrigger::append(const char *log, size_t length) {
     std::lock_guard<std::recursive_mutex> lock_append(logMutex);
     //没有要写入的内容
     if (getLogLength() == 0) {
@@ -102,11 +102,11 @@ size_t FileBuffer::append(const char *log, size_t length) {
  * 剩余未写入的空间
  * @return
  */
-size_t FileBuffer::emptySize() {
+size_t BufferTrigger::emptySize() {
     return _bufferSize - (_writerPointer - _bufferPointer);
 }
 
-void FileBuffer::initCompressProperty() {
+void BufferTrigger::initCompressProperty() {
     if (compressed) {
         zStream.zalloc = Z_NULL;
         zStream.zfree = Z_NULL;
@@ -115,18 +115,18 @@ void FileBuffer::initCompressProperty() {
     }
 }
 
-void FileBuffer::clear() {
+void BufferTrigger::clear() {
     std::lock_guard<std::recursive_mutex> lock_clear(logMutex);
     _writerPointer = _dataPointer;
     memset(_writerPointer, '\0', emptySize());
     updateLogLength(getLogLength());
 }
 
-void FileBuffer::setAsyncFileFlush(FileDifferential *flush) {
+void BufferTrigger::setAsyncFileFlush(FileDifferential *flush) {
     asyncFileFlush = flush;
 }
 
-void FileBuffer::asyncFlush(FileDifferential *flush, void *releaseThis) {
+void BufferTrigger::asyncFlush(FileDifferential *flush, void *releaseThis) {
     if (flush == nullptr) {
         if (releaseThis != nullptr) {
             delete releaseThis;
@@ -148,7 +148,7 @@ void FileBuffer::asyncFlush(FileDifferential *flush, void *releaseThis) {
     }
 }
 
-bool FileBuffer::openLogFile(const char *log_path) {
+bool BufferTrigger::openLogFile(const char *log_path) {
     if (log_path != nullptr) {
         FILE* _file_log = fopen(log_path, "ab+");
         if(_file_log != NULL) {

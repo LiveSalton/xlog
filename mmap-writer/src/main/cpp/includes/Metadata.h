@@ -10,7 +10,7 @@
 #include <string>
 #include <string.h>
 
-namespace log_header {
+namespace space_mmap_writer {
     static const char metaMagic = '\x11';
 
     struct Meta {

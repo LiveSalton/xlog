@@ -15,7 +15,7 @@ class FileDifferential{
 
 }
 
-class FileBuffer{
+class BufferTrigger{
 
 }
 
@@ -24,10 +24,10 @@ class FlushBuffer{
 }
 
 
-Metadata --> FileBuffer
-FlushBuffer --> FileBuffer
-FileBuffer --> MmapWriter
-FileDifferential --> FileBuffer
+Metadata --> BufferTrigger
+FlushBuffer --> BufferTrigger
+BufferTrigger --> MmapWriter
+FileDifferential --> BufferTrigger
 FileDifferential --> MmapWriter
 ```
 

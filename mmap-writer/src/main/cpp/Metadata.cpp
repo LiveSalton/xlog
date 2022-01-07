@@ -6,7 +6,7 @@
 
 #include "includes/Metadata.h"
 
-using namespace log_header;
+using namespace space_mmap_writer;
 
 MetaData::MetaData(void *bufferData, size_t bufferSize) {
     _bufferData = (char *) bufferData;

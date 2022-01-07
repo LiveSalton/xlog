@@ -18,7 +18,7 @@
 #include "LogBufferHeader.h"
 #include <zlib.h>
 
-using namespace log_header;
+using namespace space_mmap_writer;
 
 class LogBuffer {
 public:

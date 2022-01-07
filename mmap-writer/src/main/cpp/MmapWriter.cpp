@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <FileBuffer.h>
+#include <BufferTrigger.h>
 
 static void writeDirtyDataToFile(int description);
 
@@ -73,7 +73,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
                     bufferFileDescription, 0);
             if (bufferPointerTmp != MAP_FAILED) {
                 //写入脏数据
-                FileBuffer *logBufferTmp = new FileBuffer(bufferPointerTmp, bufferSize);
+                BufferTrigger *logBufferTmp = new BufferTrigger(bufferPointerTmp, bufferSize);
                 //实际写入的数据要比文件限制小
                 size_t dataSize = logBufferTmp->getLogLength();
                 if (dataSize > 0) {
@@ -88,7 +88,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
 
 
 void flushInfo(jlong buffer_pointer_) {
-    FileBuffer *logBuffer = reinterpret_cast<FileBuffer *>(buffer_pointer_);
+    BufferTrigger *logBuffer = reinterpret_cast<BufferTrigger *>(buffer_pointer_);
     logBuffer->asyncFlush(fileDifferential, nullptr);
 }
 
@@ -144,7 +144,7 @@ Java_com_salton123_writer_MmapWriter_create(
     if (fileDifferential == nullptr) {
         fileDifferential = new FileDifferential();
     }
-    FileBuffer *logBuffer = new FileBuffer(mMap, bufferSize);
+    BufferTrigger *logBuffer = new BufferTrigger(mMap, bufferSize);
     logBuffer->setAsyncFileFlush(fileDifferential);
     //将buffer内的数据清0， 并写入日志文件路径
     logBuffer->init((char *) savePath, strlen(savePath), compress);
@@ -158,7 +158,7 @@ JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buffer_pointer_, jstring info_) {
     const char *info = env->GetStringUTFChars(info_, 0);
     jsize infoLength = env->GetStringUTFLength(info_);
-    FileBuffer *logBuffer = reinterpret_cast<FileBuffer *>(buffer_pointer_);
+    BufferTrigger *logBuffer = reinterpret_cast<BufferTrigger *>(buffer_pointer_);
     if (infoLength >= logBuffer->emptySize()) {
         logBuffer->asyncFlush(fileDifferential, nullptr);
     }
