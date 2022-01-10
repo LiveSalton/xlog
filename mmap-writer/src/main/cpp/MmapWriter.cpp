@@ -16,9 +16,9 @@ static void writeDirtyDataToFile(int description);
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize);
 
-void flushInfo(jlong buffer_pointer_);
+void asyncFlush(jlong buffer_pointer_);
 
-static FileDifferential *fileDifferential = nullptr;
+static FileAsyncFlusher *fileAsyncFlusher = nullptr;
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize) {
     char *mapPointer = nullptr;
@@ -77,7 +77,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
                 //实际写入的数据要比文件限制小
                 size_t dataSize = logBufferTmp->getLogLength();
                 if (dataSize > 0) {
-                    logBufferTmp->asyncFlush(fileDifferential, logBufferTmp);
+                    logBufferTmp->asyncFlush(fileAsyncFlusher, logBufferTmp);
                 } else {
                     delete logBufferTmp;
                 }
@@ -87,9 +87,9 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
 }
 
 
-void flushInfo(jlong buffer_pointer_) {
+void asyncFlush(jlong buffer_pointer_) {
     BufferTrigger *logBuffer = reinterpret_cast<BufferTrigger *>(buffer_pointer_);
-    logBuffer->asyncFlush(fileDifferential, nullptr);
+    logBuffer->asyncFlush(fileAsyncFlusher, nullptr);
 }
 
 extern "C"
@@ -141,11 +141,11 @@ Java_com_salton123_writer_MmapWriter_create(
         mMap = new char[bufferSize];
         enableMmap = false;
     }
-    if (fileDifferential == nullptr) {
-        fileDifferential = new FileDifferential();
+    if (fileAsyncFlusher == nullptr) {
+        fileAsyncFlusher = new FileAsyncFlusher();
     }
     BufferTrigger *logBuffer = new BufferTrigger(mMap, bufferSize);
-    logBuffer->setAsyncFileFlush(fileDifferential);
+    logBuffer->setAsyncFileFlush(fileAsyncFlusher);
     //将buffer内的数据清0， 并写入日志文件路径
     logBuffer->init((char *) savePath, strlen(savePath), compress);
     logBuffer->enableMmap = enableMmap;
@@ -160,7 +160,7 @@ Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buff
     jsize infoLength = env->GetStringUTFLength(info_);
     BufferTrigger *logBuffer = reinterpret_cast<BufferTrigger *>(buffer_pointer_);
     if (infoLength >= logBuffer->emptySize()) {
-        logBuffer->asyncFlush(fileDifferential, nullptr);
+        logBuffer->asyncFlush(fileAsyncFlusher, nullptr);
     }
     logBuffer->append(info, infoLength);
     env->ReleaseStringUTFChars(info_, info);
@@ -169,17 +169,17 @@ Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buff
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_flush(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
-    flushInfo(buffer_pointer);
+    asyncFlush(buffer_pointer);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_destory(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
-    flushInfo(buffer_pointer);
-    if (fileDifferential != nullptr) {
-        delete fileDifferential;
+    asyncFlush(buffer_pointer);
+    if (fileAsyncFlusher != nullptr) {
+        delete fileAsyncFlusher;
     }
-    fileDifferential = nullptr;
+    fileAsyncFlusher = nullptr;
 }
 
 

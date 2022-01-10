@@ -7,11 +7,11 @@ class MmapWriter{
 
 }
 
-class Metadata{
+class Metadata {
 
 }
 
-class FileDifferential{
+class FileAsyncFlusher {
 
 }
 
@@ -27,7 +27,6 @@ class FlushBuffer{
 Metadata --> BufferTrigger
 FlushBuffer --> BufferTrigger
 BufferTrigger --> MmapWriter
-FileDifferential --> BufferTrigger
-FileDifferential --> MmapWriter
+FileAsyncFlusher --> BufferTrigger
 ```
 

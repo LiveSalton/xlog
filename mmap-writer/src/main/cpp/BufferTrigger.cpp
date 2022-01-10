@@ -122,11 +122,11 @@ void BufferTrigger::clear() {
     updateLogLength(getLogLength());
 }
 
-void BufferTrigger::setAsyncFileFlush(FileDifferential *flush) {
+void BufferTrigger::setAsyncFileFlush(FileAsyncFlusher *flush) {
     asyncFileFlush = flush;
 }
 
-void BufferTrigger::asyncFlush(FileDifferential *flush, void *releaseThis) {
+void BufferTrigger::asyncFlush(FileAsyncFlusher *flush, void *releaseThis) {
     if (flush == nullptr) {
         if (releaseThis != nullptr) {
             delete releaseThis;
@@ -142,7 +142,7 @@ void BufferTrigger::asyncFlush(FileDifferential *flush, void *releaseThis) {
         flushBuffer->write(_dataPointer, getLogLength());
         flushBuffer->releaseThis(releaseThis);
         clear();
-        flush->asyncFlush(flushBuffer);
+        flush->runAsync(flushBuffer);
     } else if (releaseThis != nullptr) {
         delete releaseThis;
     }

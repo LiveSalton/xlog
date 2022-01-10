@@ -4,8 +4,8 @@
  * Description: 差速器，协调mmap高速缓存和文件流之间的速度差异
  */
 
-#ifndef XLOG_SDK_FILEDIFFERENTIAL_H
-#define XLOG_SDK_FILEDIFFERENTIAL_H
+#ifndef XLOG_SDK_FILEASYNCFLUSHER_H
+#define XLOG_SDK_FILEASYNCFLUSHER_H
 
 #include <sys/types.h>
 #include <vector>
@@ -15,13 +15,13 @@
 #include <unistd.h>
 #include "FlushBuffer.h"
 
-class FileDifferential {
+class FileAsyncFlusher {
 public:
-    FileDifferential();
+    FileAsyncFlusher();
 
-    ~FileDifferential();
+    ~FileAsyncFlusher();
 
-    bool asyncFlush(FlushBuffer *flushBuffer);
+    bool runAsync(FlushBuffer *flushBuffer);
 
 private:
     void asyncThreadTask();
@@ -35,4 +35,4 @@ private:
     bool isExited = false;
 };
 
-#endif //XLOG_SDK_FILEDIFFERENTIAL_H
+#endif //XLOG_SDK_FILEASYNCFLUSHER_H

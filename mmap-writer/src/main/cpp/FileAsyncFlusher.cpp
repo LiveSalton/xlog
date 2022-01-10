@@ -1,23 +1,23 @@
 /**
  * Time:2022/1/7 14:41
  * Author:
- * Description:
+ * Description:异步同步缓存内容到文件中
  */
 
-#include "includes/FileDifferential.h"
+#include "includes/FileAsyncFlusher.h"
 
-FileDifferential::FileDifferential() {
+FileAsyncFlusher::FileAsyncFlusher() {
     //初始化线程
-    asyncThread = std::thread(&FileDifferential::asyncThreadTask, this);
+    asyncThread = std::thread(&FileAsyncFlusher::asyncThreadTask, this);
 }
 
-FileDifferential::~FileDifferential() {
+FileAsyncFlusher::~FileAsyncFlusher() {
     isExited = true;
     asyncCondition.notify_all();
     asyncThread.join();
 }
 
-void FileDifferential::asyncThreadTask() {
+void FileAsyncFlusher::asyncThreadTask() {
     while (true) {
         std::unique_lock<std::mutex> lockAsyncLog(asyncMutex);
         while (!asyncBuffer.empty()) {
@@ -34,7 +34,7 @@ void FileDifferential::asyncThreadTask() {
     }
 }
 
-bool FileDifferential::asyncFlush(FlushBuffer *flushBuffer) {
+bool FileAsyncFlusher::runAsync(FlushBuffer *flushBuffer) {
     std::unique_lock<std::mutex> lck_async_flush(asyncMutex);
     if (isExited) {
         delete flushBuffer;
@@ -47,7 +47,7 @@ bool FileDifferential::asyncFlush(FlushBuffer *flushBuffer) {
     return true;
 }
 
-ssize_t FileDifferential::flush(FlushBuffer *flushBuffer) {
+ssize_t FileAsyncFlusher::flush(FlushBuffer *flushBuffer) {
     ssize_t written = 0;
     FILE *logFile = flushBuffer->logFile();
     if (logFile != nullptr && flushBuffer->length() > 0) {
