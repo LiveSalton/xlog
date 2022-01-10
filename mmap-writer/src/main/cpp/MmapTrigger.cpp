@@ -10,6 +10,7 @@ MmapTrigger::MmapTrigger(char *dataPointer, size_t bufferSize) :
         _bufferPointer(dataPointer),
         _bufferSize(bufferSize),
         metaData(_bufferPointer, _bufferSize) {
+    fileFlusher = new FileFlusher();
     if (metaData.isAvailable()) {
         //这一步数据指针已经加上了metadata的偏移
         _dataPointer = (char *) metaData.metaPointer();
@@ -115,13 +116,8 @@ void MmapTrigger::initCompressProperty() {
     }
 }
 
-
-void MmapTrigger::setAsyncFileFlush(FileFlusher *flush) {
-    asyncFileFlush = flush;
-}
-
-void MmapTrigger::asyncFlush(FileFlusher *flush, void *releaseThis) {
-    if (flush == nullptr) {
+void MmapTrigger::asyncFlush(void *releaseThis) {
+    if (fileFlusher == nullptr) {
         if (releaseThis != nullptr) {
             delete releaseThis;
         }
@@ -136,7 +132,7 @@ void MmapTrigger::asyncFlush(FileFlusher *flush, void *releaseThis) {
         bufferFlusher->write(_dataPointer, getLogLength());
         bufferFlusher->releaseThis(releaseThis);
         clear();
-        flush->runAsync(bufferFlusher);
+        fileFlusher->runAsync(bufferFlusher);
     } else if (releaseThis != nullptr) {
         delete releaseThis;
     }

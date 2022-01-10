@@ -18,7 +18,6 @@ static char *openMmap(int bufferFileDescription, size_t bufferSize);
 
 void asyncFlush(jlong buffer_pointer_);
 
-static FileFlusher *fileAsyncFlusher = nullptr;
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize) {
     char *mapPointer = nullptr;
@@ -77,7 +76,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
                 //实际写入的数据要比文件限制小
                 size_t dataSize = mmapTriger->getLogLength();
                 if (dataSize > 0) {
-                    mmapTriger->asyncFlush(fileAsyncFlusher, mmapTriger);
+                    mmapTriger->asyncFlush(mmapTriger);
                 } else {
                     delete mmapTriger;
                 }
@@ -89,7 +88,7 @@ static void writeDirtyDataToFile(int bufferFileDescription) {
 
 void asyncFlush(jlong buffer_pointer_) {
     MmapTrigger *logBuffer = reinterpret_cast<MmapTrigger *>(buffer_pointer_);
-    logBuffer->asyncFlush(fileAsyncFlusher, nullptr);
+    logBuffer->asyncFlush(nullptr);
 }
 
 extern "C"
@@ -141,11 +140,7 @@ Java_com_salton123_writer_MmapWriter_create(
         mMap = new char[bufferSize];
         enableMmap = false;
     }
-    if (fileAsyncFlusher == nullptr) {
-        fileAsyncFlusher = new FileFlusher();
-    }
     MmapTrigger *logBuffer = new MmapTrigger(mMap, bufferSize);
-    logBuffer->setAsyncFileFlush(fileAsyncFlusher);
     //将buffer内的数据清0， 并写入日志文件路径
     logBuffer->init((char *) savePath, strlen(savePath), compress);
     logBuffer->enableMmap = enableMmap;
@@ -160,7 +155,7 @@ Java_com_salton123_writer_MmapWriter_write(JNIEnv *env, jobject thiz, jlong buff
     jsize infoLength = env->GetStringUTFLength(info_);
     MmapTrigger *logBuffer = reinterpret_cast<MmapTrigger *>(buffer_pointer_);
     if (infoLength >= logBuffer->emptySize()) {
-        logBuffer->asyncFlush(fileAsyncFlusher, nullptr);
+        logBuffer->asyncFlush(nullptr);
     }
     logBuffer->append(info, infoLength);
     env->ReleaseStringUTFChars(info_, info);
@@ -176,10 +171,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_salton123_writer_MmapWriter_destory(JNIEnv *env, jobject thiz, jlong buffer_pointer) {
     asyncFlush(buffer_pointer);
-    if (fileAsyncFlusher != nullptr) {
-        delete fileAsyncFlusher;
+    MmapTrigger *logBuffer = reinterpret_cast<MmapTrigger *>(buffer_pointer);
+    if (logBuffer != nullptr) {
+        delete logBuffer;
     }
-    fileAsyncFlusher = nullptr;
 }
 
 

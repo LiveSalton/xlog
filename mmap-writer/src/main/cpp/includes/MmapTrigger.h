@@ -37,12 +37,11 @@ public:
 
     size_t emptySize();
 
-    void setAsyncFileFlush(FileFlusher *flush);
-
-    void asyncFlush(FileFlusher *flush, void *releaseThis);
+    void asyncFlush(void *releaseThis);
 
 public:
     bool enableMmap = true;
+    FileFlusher *fileFlusher = nullptr;
 
 private:
     void clear();
@@ -54,8 +53,6 @@ private:
     bool openLogFile(const char *logPath);
 
     FILE *_logFile = nullptr;
-
-    FileFlusher *asyncFileFlush = nullptr;
 
     char *const _bufferPointer = nullptr;
 
