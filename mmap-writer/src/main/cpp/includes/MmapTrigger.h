@@ -5,8 +5,8 @@
  * 协调mmap高速缓存和文件流之间的速度差异
  */
 
-#ifndef XLOG_SDK_BUFFERTRIGGER_H
-#define XLOG_SDK_BUFFERTRIGGER_H
+#ifndef XLOG_SDK_MMAPTRIGGER_H
+#define XLOG_SDK_MMAPTRIGGER_H
 
 #include <string>
 #include <math.h>
@@ -16,18 +16,18 @@
 #include<vector>
 #include <mutex>
 #include <condition_variable>
-#include "FileAsyncFlusher.h"
-#include "FlushBuffer.h"
+#include "FileFlusher.h"
+#include "BufferFlusher.h"
 #include "Metadata.h"
 #include <zlib.h>
 
 using namespace space_mmap_writer;
 
-class BufferTrigger {
+class MmapTrigger {
 public:
-    BufferTrigger(char *dataPointer, size_t bufferSize);
+    MmapTrigger(char *dataPointer, size_t bufferSize);
 
-    ~BufferTrigger();
+    ~MmapTrigger();
 
     void init(char *logPath, size_t logPathLength, bool compressed);
 
@@ -37,9 +37,9 @@ public:
 
     size_t emptySize();
 
-    void setAsyncFileFlush(FileAsyncFlusher *flush);
+    void setAsyncFileFlush(FileFlusher *flush);
 
-    void asyncFlush(FileAsyncFlusher *flush, void *releaseThis);
+    void asyncFlush(FileFlusher *flush, void *releaseThis);
 
 public:
     bool enableMmap = true;
@@ -55,7 +55,7 @@ private:
 
     FILE *_logFile = nullptr;
 
-    FileAsyncFlusher *asyncFileFlush = nullptr;
+    FileFlusher *asyncFileFlush = nullptr;
 
     char *const _bufferPointer = nullptr;
 
@@ -72,4 +72,4 @@ private:
     bool compressed = false;
 };
 
-#endif //XLOG_SDK_BUFFERTRIGGER_H
+#endif //XLOG_SDK_MMAPTRIGGER_H

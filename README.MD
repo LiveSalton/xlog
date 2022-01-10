@@ -11,7 +11,7 @@ class Metadata {
 
 }
 
-class FileAsyncFlusher {
+class FileFlusher {
 
 }
 
@@ -19,14 +19,14 @@ class BufferTrigger{
 
 }
 
-class FlushBuffer{
+class BufferFlusher{
 
 }
 
 
 Metadata --> BufferTrigger
-FlushBuffer --> BufferTrigger
 BufferTrigger --> MmapWriter
-FileAsyncFlusher --> BufferTrigger
+FileFlusher --> BufferTrigger
+BufferFlusher --> FileFlusher
 ```
 

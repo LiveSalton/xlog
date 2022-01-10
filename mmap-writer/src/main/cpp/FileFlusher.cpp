@@ -4,25 +4,25 @@
  * Description:异步同步缓存内容到文件中
  */
 
-#include "includes/FileAsyncFlusher.h"
+#include "includes/FileFlusher.h"
 
-FileAsyncFlusher::FileAsyncFlusher() {
+FileFlusher::FileFlusher() {
     //初始化线程
-    asyncThread = std::thread(&FileAsyncFlusher::asyncThreadTask, this);
+    asyncThread = std::thread(&FileFlusher::asyncThreadTask, this);
 }
 
-FileAsyncFlusher::~FileAsyncFlusher() {
+FileFlusher::~FileFlusher() {
     isExited = true;
     asyncCondition.notify_all();
     asyncThread.join();
 }
 
-void FileAsyncFlusher::asyncThreadTask() {
+void FileFlusher::asyncThreadTask() {
     while (true) {
         std::unique_lock<std::mutex> lockAsyncLog(asyncMutex);
         while (!asyncBuffer.empty()) {
             //不断写入数据
-            FlushBuffer *flushBuffer = asyncBuffer.back();
+            BufferFlusher *flushBuffer = asyncBuffer.back();
             asyncBuffer.pop_back(); //移除
             flush(flushBuffer);
         }
@@ -34,7 +34,7 @@ void FileAsyncFlusher::asyncThreadTask() {
     }
 }
 
-bool FileAsyncFlusher::runAsync(FlushBuffer *flushBuffer) {
+bool FileFlusher::runAsync(BufferFlusher *flushBuffer) {
     std::unique_lock<std::mutex> lck_async_flush(asyncMutex);
     if (isExited) {
         delete flushBuffer;
@@ -47,7 +47,7 @@ bool FileAsyncFlusher::runAsync(FlushBuffer *flushBuffer) {
     return true;
 }
 
-ssize_t FileAsyncFlusher::flush(FlushBuffer *flushBuffer) {
+ssize_t FileFlusher::flush(BufferFlusher *flushBuffer) {
     ssize_t written = 0;
     FILE *logFile = flushBuffer->logFile();
     if (logFile != nullptr && flushBuffer->length() > 0) {

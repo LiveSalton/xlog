@@ -1,12 +1,12 @@
 /**
  * Time:2022/1/6 11:01
  * Author:
- * Description: 文件缓存层(filename_buf)
+ * Description: 文件缓存交接处理层(filename_buf)
  */
 
-#include "includes/BufferTrigger.h"
+#include "includes/MmapTrigger.h"
 
-BufferTrigger::BufferTrigger(char *dataPointer, size_t bufferSize) :
+MmapTrigger::MmapTrigger(char *dataPointer, size_t bufferSize) :
         _bufferPointer(dataPointer),
         _bufferSize(bufferSize),
         metaData(_bufferPointer, _bufferSize) {
@@ -28,7 +28,7 @@ BufferTrigger::BufferTrigger(char *dataPointer, size_t bufferSize) :
     memset(&zStream, 0, sizeof(zStream));
 }
 
-BufferTrigger::~BufferTrigger() {
+MmapTrigger::~MmapTrigger() {
     std::lock_guard<std::recursive_mutex> lck_release(logMutex);
     if (compressed && Z_NULL != zStream.state) {
         deflateEnd(&zStream);
@@ -43,15 +43,15 @@ BufferTrigger::~BufferTrigger() {
     }
 }
 
-size_t BufferTrigger::getLogLength() {
+size_t MmapTrigger::getLogLength() {
     return _writerPointer - _dataPointer;
 }
 
-void BufferTrigger::updateLogLength(size_t length) {
+void MmapTrigger::updateLogLength(size_t length) {
     metaData.setLogLength(length);
 }
 
-void BufferTrigger::init(char *logPath, size_t logPathLength, bool compressed) {
+void MmapTrigger::init(char *logPath, size_t logPathLength, bool compressed) {
     //简化上锁解锁代码
     std::lock_guard<std::recursive_mutex> lock_release(logMutex);
     memset(_bufferPointer, '\0', _bufferSize);
@@ -70,7 +70,7 @@ void BufferTrigger::init(char *logPath, size_t logPathLength, bool compressed) {
     openLogFile(logPath);
 }
 
-size_t BufferTrigger::append(const char *log, size_t length) {
+size_t MmapTrigger::append(const char *log, size_t length) {
     std::lock_guard<std::recursive_mutex> lock_append(logMutex);
     //没有要写入的内容
     if (getLogLength() == 0) {
@@ -102,11 +102,11 @@ size_t BufferTrigger::append(const char *log, size_t length) {
  * 剩余未写入的空间
  * @return
  */
-size_t BufferTrigger::emptySize() {
+size_t MmapTrigger::emptySize() {
     return _bufferSize - (_writerPointer - _bufferPointer);
 }
 
-void BufferTrigger::initCompressProperty() {
+void MmapTrigger::initCompressProperty() {
     if (compressed) {
         zStream.zalloc = Z_NULL;
         zStream.zfree = Z_NULL;
@@ -115,18 +115,12 @@ void BufferTrigger::initCompressProperty() {
     }
 }
 
-void BufferTrigger::clear() {
-    std::lock_guard<std::recursive_mutex> lock_clear(logMutex);
-    _writerPointer = _dataPointer;
-    memset(_writerPointer, '\0', emptySize());
-    updateLogLength(getLogLength());
-}
 
-void BufferTrigger::setAsyncFileFlush(FileAsyncFlusher *flush) {
+void MmapTrigger::setAsyncFileFlush(FileFlusher *flush) {
     asyncFileFlush = flush;
 }
 
-void BufferTrigger::asyncFlush(FileAsyncFlusher *flush, void *releaseThis) {
+void MmapTrigger::asyncFlush(FileFlusher *flush, void *releaseThis) {
     if (flush == nullptr) {
         if (releaseThis != nullptr) {
             delete releaseThis;
@@ -138,20 +132,27 @@ void BufferTrigger::asyncFlush(FileAsyncFlusher *flush, void *releaseThis) {
         if (compressed && Z_NULL != zStream.state) {
             deflateEnd(&zStream);
         }
-        FlushBuffer *flushBuffer = new FlushBuffer(_logFile);
-        flushBuffer->write(_dataPointer, getLogLength());
-        flushBuffer->releaseThis(releaseThis);
+        BufferFlusher *bufferFlusher = new BufferFlusher(_logFile);
+        bufferFlusher->write(_dataPointer, getLogLength());
+        bufferFlusher->releaseThis(releaseThis);
         clear();
-        flush->runAsync(flushBuffer);
+        flush->runAsync(bufferFlusher);
     } else if (releaseThis != nullptr) {
         delete releaseThis;
     }
 }
 
-bool BufferTrigger::openLogFile(const char *log_path) {
+void MmapTrigger::clear() {
+    std::lock_guard<std::recursive_mutex> lock_clear(logMutex);
+    _writerPointer = _dataPointer;
+    memset(_writerPointer, '\0', emptySize());
+    updateLogLength(getLogLength());
+}
+
+bool MmapTrigger::openLogFile(const char *log_path) {
     if (log_path != nullptr) {
-        FILE* _file_log = fopen(log_path, "ab+");
-        if(_file_log != NULL) {
+        FILE *_file_log = fopen(log_path, "ab+");
+        if (_file_log != NULL) {
             _logFile = _file_log;
             return true;
         }

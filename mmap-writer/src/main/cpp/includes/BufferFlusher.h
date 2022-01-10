@@ -4,19 +4,19 @@
  * Description:
  */
 
-#ifndef XLOG_SDK_FLUSHBUFFER_H
-#define XLOG_SDK_FLUSHBUFFER_H
+#ifndef XLOG_SDK_BUFFERFLUSHER_H
+#define XLOG_SDK_BUFFERFLUSHER_H
 
 #include <sys/types.h>
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
 
-class FlushBuffer {
+class BufferFlusher {
 
 public:
-    FlushBuffer(FILE* log_file, size_t size = 128);
-    ~FlushBuffer();
+    BufferFlusher(FILE* log_file, size_t size = 128);
+    ~BufferFlusher();
     void write(void* data, size_t len);
     void reset();
     size_t length();
@@ -37,4 +37,4 @@ private:
 };
 
 
-#endif //XLOG_SDK_FLUSHBUFFER_H
+#endif //XLOG_SDK_BUFFERFLUSHER_H
