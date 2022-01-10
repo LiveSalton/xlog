@@ -11,13 +11,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <MmapTrigger.h>
-
-static void writeDirtyDataToFile(int description);
-
-static char *openMmap(int bufferFileDescription, size_t bufferSize);
-
-void asyncFlush(jlong buffer_pointer_);
-
+#include "MmapWriter.h"
 
 static char *openMmap(int bufferFileDescription, size_t bufferSize) {
     char *mapPointer = nullptr;
