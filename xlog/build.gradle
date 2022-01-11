@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply from: '../publish.gradle'
 android {
     compileSdk "${rootProject.ext.android.compileSdkVersion}" as Integer
@@ -17,7 +18,6 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-//    api project(":flushwriter")
     api project(":mmap-writer")
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.2.71"
 }

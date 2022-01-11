@@ -58,11 +58,11 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
         Thread {
             while (true) {
                 XLog.i("MainActivity", "hello ${index++}")
-                XLog.w("MainActivity", "hello ${index++}")
-                XLog.e("MainActivity", "hello ${index++}")
-                XLog.v("MainActivity", "hello ${index++}")
-                XLog.d("MainActivity", "hello ${index++}")
-//                Thread.sleep(100)
+//                XLog.w("MainActivity", "hello ${index++}")
+//                XLog.e("MainActivity", "hello ${index++}")
+//                XLog.v("MainActivity", "hello ${index++}")
+//                XLog.d("MainActivity", "hello ${index++}")
+                Thread.sleep(100)
 //                XLog.w(this, "MainActivityhello")
 //                XLog.v(this, "MainActivityhello")
 //                XLog.d(this, "MainActivityhello")
