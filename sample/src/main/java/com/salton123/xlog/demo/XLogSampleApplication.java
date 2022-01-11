@@ -27,6 +27,7 @@ public class XLogSampleApplication extends Application {
             .setLogDefaultSplitSize(5)  //split log size , unit m
             .setSavePath(Utils.getDefaultPath() + getPackageName()) //log save path
             .setLogDeleteDelayDay(10)   //log delete delay day
+            .setPrefix("tony")
             .setCallback(new Function2<Integer, String, Unit>() {
                 @Override
                 public Unit invoke(Integer integer, String s) {

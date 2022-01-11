@@ -11,6 +11,7 @@ import com.salton123.log.printer.FilePrinter
 object XLog {
     private var sConfig = XLogConfig()
     private var mFilePrinter = FilePrinter(sConfig)
+
     @JvmStatic
     fun config(config: XLogConfig) {
         sConfig = config
@@ -27,7 +28,7 @@ object XLog {
         val methodName = Utils.callerMethodName
         val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
         if (sConfig.isDebugable) {
-            Log.v(Utils.objClassName(tag), logText)
+            Log.v(objClassName(tag), logText)
         }
         saveLog(logText)
     }
@@ -39,7 +40,7 @@ object XLog {
         val methodName = Utils.callerMethodName
         val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
         if (sConfig.isDebugable) {
-            Log.d(Utils.objClassName(tag), logText)
+            Log.d(objClassName(tag), logText)
         }
         saveLog(logText)
     }
@@ -51,7 +52,7 @@ object XLog {
         val methodName = Utils.callerMethodName
         val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
         if (sConfig.isDebugable) {
-            Log.i(Utils.objClassName(tag), logText)
+            Log.i(objClassName(tag), logText)
         }
         saveLog(logText)
     }
@@ -63,7 +64,7 @@ object XLog {
         val methodName = Utils.callerMethodName
         val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
         if (sConfig.isDebugable) {
-            Log.w(Utils.objClassName(tag), logText)
+            Log.w(objClassName(tag), logText)
         }
         saveLog(logText)
     }
@@ -75,7 +76,7 @@ object XLog {
         val methodName = Utils.callerMethodName
         val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
         if (sConfig.isDebugable) {
-            Log.e(Utils.objClassName(tag), logText)
+            Log.e(objClassName(tag), logText)
         }
         saveLog(logText)
     }
@@ -83,6 +84,17 @@ object XLog {
     private fun saveLog(msg: String) {
         if (sConfig.whetherToSaveLog) {
             mFilePrinter.println(msg)
+        }
+    }
+
+    /**
+     * Returns the obj`s classname
+     */
+    private fun objClassName(obj: Any): String? {
+        return if (obj is String) {
+            sConfig.prefix + "-" + obj
+        } else {
+            sConfig.prefix + "-" + obj.javaClass.toString()
         }
     }
 }

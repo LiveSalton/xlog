@@ -80,17 +80,7 @@ object Utils {
         return sb.toString()
     }
 
-    /**
-     * Returns the obj`s classname
-     */
-    @JvmStatic
-    fun objClassName(obj: Any): String {
-        return if (obj is String) {
-            obj
-        } else {
-            obj.javaClass.simpleName
-        }
-    }
+
 
     fun makeDirs(filePath: String): Boolean {
         val folderName = getFolderName(filePath)

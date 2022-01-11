@@ -25,14 +25,21 @@ class XLogConfig {
         private set
     var callback: ((code: Int, message: String) -> Unit)? = null
         private set
+    var prefix = "salton"
+        private set
 
     fun setDebugable(debugable: Boolean): XLogConfig {
         isDebugable = debugable
         return this
     }
 
-    fun setSavePath(savePath: String?): XLogConfig {
-        this.savePath = savePath!!
+    fun setSavePath(savePath: String): XLogConfig {
+        this.savePath = savePath
+        return this
+    }
+
+    fun setPrefix(prefix: String): XLogConfig {
+        this.prefix = prefix
         return this
     }
 
