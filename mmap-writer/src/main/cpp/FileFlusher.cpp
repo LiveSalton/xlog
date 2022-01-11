@@ -22,9 +22,9 @@ void FileFlusher::asyncThreadTask() {
         std::unique_lock<std::mutex> lockAsyncLog(asyncMutex);
         while (!asyncBuffer.empty()) {
             //不断写入数据
-            BufferFlusher *flushBuffer = asyncBuffer.back();
+            BufferFlusher *bufferFlusher = asyncBuffer.back();
             asyncBuffer.pop_back(); //移除
-            flush(flushBuffer);
+            flush(bufferFlusher);
         }
         if (isExited) {
             return;
@@ -50,8 +50,8 @@ bool FileFlusher::runAsync(BufferFlusher *flushBuffer) {
 ssize_t FileFlusher::flush(BufferFlusher *flushBuffer) {
     ssize_t written = 0;
     FILE *logFile = flushBuffer->logFile();
-    if (logFile != nullptr && flushBuffer->length() > 0) {
-        written = fwrite(flushBuffer->ptr(), flushBuffer->length(), 1, logFile);
+    if (logFile != nullptr && flushBuffer->getLength() > 0) {
+        written = fwrite(flushBuffer->dataPointer(), flushBuffer->getLength(), 1, logFile);
         fflush(logFile);
     }
     delete flushBuffer;

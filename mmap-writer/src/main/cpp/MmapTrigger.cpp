@@ -22,7 +22,7 @@ MmapTrigger::MmapTrigger(char *dataPointer, size_t bufferSize) :
         if (logPath != nullptr) {
             openLogFile(logPath);
             //释放
-            delete[] logPath;
+            ::operator delete(logPath);
         }
     }
     //清空zStream
@@ -37,7 +37,7 @@ MmapTrigger::~MmapTrigger() {
     if (enableMmap) {
         munmap(_bufferPointer, _bufferSize);
     } else {
-        delete[] _bufferPointer;
+        ::operator delete(_bufferPointer);
     }
     if (_logFile != nullptr) {
         fclose(_logFile);
@@ -130,7 +130,7 @@ void MmapTrigger::asyncFlush(void *releaseThis) {
         }
         BufferFlusher *bufferFlusher = new BufferFlusher(_logFile);
         bufferFlusher->write(_dataPointer, getLogLength());
-        bufferFlusher->releaseThis(releaseThis);
+        bufferFlusher->release(releaseThis);
         clear();
         fileFlusher->runAsync(bufferFlusher);
     } else if (releaseThis != nullptr) {

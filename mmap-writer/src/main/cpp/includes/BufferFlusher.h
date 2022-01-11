@@ -1,5 +1,5 @@
 /**
- * Time:2021/12/10 14:27
+ * Time:2022/1/10 17:51
  * Author:
  * Description:
  */
@@ -13,28 +13,29 @@
 #include <stdio.h>
 
 class BufferFlusher {
+public :
+    BufferFlusher(FILE *logFile, size_t blockSize = 128);
 
-public:
-    BufferFlusher(FILE* log_file, size_t size = 128);
     ~BufferFlusher();
-    void write(void* data, size_t len);
-    void reset();
-    size_t length();
-    void* ptr();
-    FILE* logFile();
 
-    void releaseThis(void *release);
+    void write(void *data, size_t length);
+
+    size_t getLength();
+
+    void *dataPointer();
+
+    FILE *logFile();
+
+    void release(void *releaseObj);
 
 private:
-    FILE* log_file = nullptr;
-    void* release = nullptr;
-    char* data_ptr = nullptr;
-    char* write_ptr = nullptr;
-    size_t capacity;
+    FILE *_logFile = nullptr;
+    void *_releaseObj = nullptr;
+    char *_dataPointer = nullptr;
+    char *_writerPointer = nullptr;
+    size_t _blockSize;
 
     size_t emptySize();
-
 };
-
 
 #endif //XLOG_SDK_BUFFERFLUSHER_H
