@@ -36,6 +36,9 @@ XLog.i(this,"information");
          .setLogDeleteDelayDay(10)   //log delete delay day
  );
 ```
+
+### 多实例：
+涵盖所有sdk使用过程中，均会定制需要的日志库，可以模仿XLog的实现进行多实例操作。也可以参考Demo中多实例的方式
 ### License
 <pre>
 Copyright 2019
