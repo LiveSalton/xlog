@@ -3,10 +3,14 @@ package com.salton123.xlog.demo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.salton123.log.Utils.defaultPath
 import com.salton123.log.XLog
-import kotlinx.android.synthetic.main.aty_main.tvHello
+import com.salton123.writer.MmapWriter
+import java.io.File
+import kotlin.system.exitProcess
+import kotlinx.android.synthetic.main.aty_main.tvEffectiveWrite
+import kotlinx.android.synthetic.main.aty_main.tvMultiInstance
 
 /**
  * User: newSalton@outlook.com
@@ -25,50 +29,43 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
 
     var index = 0L
     val permissionsUtil by lazy { PermissionsUtil.with(this) }
+    var isStartWrite = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.aty_main)
-        tvHello.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-//                XLog.i(this, "hello")
-//                val file = File(Utils.getDefaultPath() + packageName)
-//                if (!file.exists()) {
-//                    val ret = file.parentFile.mkdirs()
-//                    XLog.i(this, "ret:$ret")
-//                }
+        val sharedPreferences = getSharedPreferences("test", Context.MODE_PRIVATE)
+        index = sharedPreferences.getLong("index", 0)
+        tvEffectiveWrite.setOnClickListener {
+            if (!isStartWrite) {
+                Thread {
+                    while (true) {
+                        XLog.i("MainActivity", "hello ${index++}")
+                        XLog.w("MainActivity", "hello ${index++}")
+                        XLog.e("MainActivity", "hello ${index++}")
+                        XLog.v("MainActivity", "hello ${index++}")
+                        XLog.d("MainActivity", "hello ${index++}")
+                        Thread.sleep(100)
+                    }
+                }.start()
+                isStartWrite = true;
+            } else {
                 val sharedPreferences = getSharedPreferences("test", Context.MODE_PRIVATE)
                 sharedPreferences.edit().apply {
                     this.putLong("index", index)
                     commit()
-                    XLog.e("MainActivity", "hello ${index}")
+                    XLog.e("MainActivity", "exit $index")
                 }
-                System.exit(0)
+                exitProcess(0)
             }
-        })
+        }
+        tvMultiInstance.setOnClickListener {
+            testMmapWriter()
+        }
         val storage = arrayOf(
             PermissionsUtil.Permission.Storage.READ_EXTERNAL_STORAGE,
             PermissionsUtil.Permission.Storage.WRITE_EXTERNAL_STORAGE
         )
         permissionsUtil.requestCode(1).permissions(*storage).request()
-        val sharedPreferences = getSharedPreferences("test", Context.MODE_PRIVATE)
-//        sharedPreferences.edit().apply {
-//            this.
-//        }
-        index = sharedPreferences.getLong("index", 0)
-        Thread {
-            while (true) {
-                XLog.i("MainActivity", "hello ${index++}")
-//                XLog.w("MainActivity", "hello ${index++}")
-//                XLog.e("MainActivity", "hello ${index++}")
-//                XLog.v("MainActivity", "hello ${index++}")
-//                XLog.d("MainActivity", "hello ${index++}")
-                Thread.sleep(100)
-//                XLog.w(this, "MainActivityhello")
-//                XLog.v(this, "MainActivityhello")
-//                XLog.d(this, "MainActivityhello")
-//                XLog.e(this, "MainActivityhello")
-            }
-        }.start()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -83,8 +80,13 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
+    private fun testMmapWriter() {
+        for (i in 1..10) {
+            val pointer = MmapWriter.create(defaultPath + File.separator + i + ".txt", 1024, false)
+            MmapWriter.write(pointer, "hello")
+            MmapWriter.flush(pointer)
+            //因为是异步写入，所以立即调用destroy存在写入不到数据的问题
+//            MmapWriter.destory(pointer)
+        }
     }
 }

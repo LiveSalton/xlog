@@ -1,5 +1,5 @@
 ### XLog
-Simple logger with mmap.
+非常实用的支持多实例的一个基于内存映射的日志写入库。
 
 ### Setup
 
@@ -60,6 +60,7 @@ limitations under the License.
 -keep class com.salton123.log.**{*;}
 ```
 
+![](./resource/mmap-class.png)
 ```plantuml
 title mmap-writer 类图
 header www.salton123.com

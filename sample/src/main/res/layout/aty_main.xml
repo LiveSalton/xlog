@@ -3,16 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tvHello"
+        android:id="@+id/tvEffectiveWrite"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="hello"
-        />
+        android:text="测试高频日志写入" />
+
+    <TextView
+        android:id="@+id/tvMultiInstance"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="测试多实例" />
 
 </LinearLayout>
