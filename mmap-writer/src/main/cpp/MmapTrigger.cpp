@@ -104,6 +104,9 @@ size_t MmapTrigger::append(const char *log, size_t length) {
  * @return
  */
 size_t MmapTrigger::emptySize() {
+    if(_writerPointer== nullptr||_bufferPointer== nullptr){
+        return _bufferSize;
+    }
     return _bufferSize - (_writerPointer - _bufferPointer);
 }
 
