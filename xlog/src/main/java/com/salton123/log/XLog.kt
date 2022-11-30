@@ -1,7 +1,7 @@
 package com.salton123.log
 
 import android.util.Log
-import com.salton123.log.printer.FilePrinter
+import com.tencent.mars.xlog.Xlog
 
 /**
  * Time:2022/1/11 15:54
@@ -9,13 +9,34 @@ import com.salton123.log.printer.FilePrinter
  * Description:
  */
 object XLog {
-    private var sConfig = XLogConfig()
-    private var mFilePrinter = FilePrinter(sConfig)
+    private var sConfig = LogConfig()
+
+    init {
+        try {
+            System.loadLibrary("c++_shared")
+            System.loadLibrary("marsxlog")
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+        }
+    }
+
+    var mmapPointer: Long = 0
+    val xlog = Xlog()
 
     @JvmStatic
-    fun config(config: XLogConfig) {
+    fun config(config: LogConfig) {
         sConfig = config
-        mFilePrinter = FilePrinter(sConfig)
+        val logConfig = Xlog.XLogConfig()
+        logConfig.level = Xlog.LEVEL_ALL
+        logConfig.mode = Xlog.AppednerModeAsync
+        logConfig.logdir = config.savePath
+        logConfig.nameprefix = config.prefix
+        logConfig.pubkey = ""
+        logConfig.compressmode = Xlog.ZLIB_MODE
+        logConfig.compresslevel = 0
+        logConfig.cachedir = config.savePath
+        logConfig.cachedays = config.logDeleteDelayDay
+        mmapPointer = xlog.newXlogInstance(logConfig)
     }
 
     /**
@@ -30,7 +51,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.v(objClassName(tag), logText)
         }
-        saveLog(logText)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
     }
 
     @JvmStatic
@@ -42,7 +63,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.d(objClassName(tag), logText)
         }
-        saveLog(logText)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
     }
 
     @JvmStatic
@@ -54,7 +75,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.i(objClassName(tag), logText)
         }
-        saveLog(logText)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
     }
 
     @JvmStatic
@@ -66,7 +87,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.w(objClassName(tag), logText)
         }
-        saveLog(logText)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
     }
 
     @JvmStatic
@@ -78,13 +99,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.e(objClassName(tag), logText)
         }
-        saveLog(logText)
-    }
-
-    private fun saveLog(msg: String) {
-        if (sConfig.whetherToSaveLog) {
-            mFilePrinter.println(msg)
-        }
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
     }
 
     /**

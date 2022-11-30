@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.salton123.log.Utils;
 import com.salton123.log.XLog;
-import com.salton123.log.XLogConfig;
+import com.salton123.log.LogConfig;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
@@ -21,7 +21,7 @@ public class XLogSampleApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        XLog.config(new XLogConfig()
+        XLog.config(new LogConfig()
             .setDebugable(BuildConfig.DEBUG) //whether print info to logcat
             .setWhetherToSaveLog(true)  //whether save log to file
             .setLogDefaultSplitSize(5)  //split log size , unit m

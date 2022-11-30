@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.salton123.log.Utils.defaultPath
 import com.salton123.log.XLog
-import com.salton123.writer.MmapWriter
 import java.io.File
 import kotlin.system.exitProcess
 import kotlinx.android.synthetic.main.aty_main.tvEffectiveWrite
@@ -82,9 +81,9 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
 
     private fun testMmapWriter() {
         for (i in 1..10) {
-            val pointer = MmapWriter.create(defaultPath + File.separator + i + ".txt", 1024, false)
-            MmapWriter.write(pointer, "hello")
-            MmapWriter.flush(pointer)
+//            val pointer = MmapWriter.create(defaultPath + File.separator + i + ".txt", 1024, false)
+//            MmapWriter.write(pointer, "hello")
+//            MmapWriter.flush(pointer)
             //因为是异步写入，所以立即调用destroy存在写入不到数据的问题
 //            MmapWriter.destory(pointer)
         }

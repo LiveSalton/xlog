@@ -10,7 +10,7 @@ package com.salton123.log
  * @param logDeleteDelayDay 默认10天后删除
  * @param logDefaultSplitSize 日志拆分大小阈值，每1M拆分
  */
-class XLogConfig {
+class LogConfig {
 
     var isDebugable: Boolean = true
         private set
@@ -28,37 +28,37 @@ class XLogConfig {
     var prefix = "salton"
         private set
 
-    fun setDebugable(debugable: Boolean): XLogConfig {
+    fun setDebugable(debugable: Boolean): LogConfig {
         isDebugable = debugable
         return this
     }
 
-    fun setSavePath(savePath: String): XLogConfig {
+    fun setSavePath(savePath: String): LogConfig {
         this.savePath = savePath
         return this
     }
 
-    fun setPrefix(prefix: String): XLogConfig {
+    fun setPrefix(prefix: String): LogConfig {
         this.prefix = prefix
         return this
     }
 
-    fun setWhetherToSaveLog(whetherToSaveLog: Boolean): XLogConfig {
+    fun setWhetherToSaveLog(whetherToSaveLog: Boolean): LogConfig {
         this.whetherToSaveLog = whetherToSaveLog
         return this
     }
 
-    fun setLogDeleteDelayDay(logDeleteDelayDay: Int): XLogConfig {
+    fun setLogDeleteDelayDay(logDeleteDelayDay: Int): LogConfig {
         this.logDeleteDelayDay = logDeleteDelayDay
         return this
     }
 
-    fun setLogDefaultSplitSize(logDefaultSplitSize: Int): XLogConfig {
+    fun setLogDefaultSplitSize(logDefaultSplitSize: Int): LogConfig {
         this.logDefaultSplitSize = logDefaultSplitSize
         return this
     }
 
-    fun setCallback(callback: ((code: Int, message: String) -> Unit)?): XLogConfig {
+    fun setCallback(callback: ((code: Int, message: String) -> Unit)?): LogConfig {
         this.callback = callback
         return this
     }
