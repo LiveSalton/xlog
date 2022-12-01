@@ -5,12 +5,9 @@
 #include <sstream>
 
 #include "includes/LogBuffer.h"
+#include "MmapWriter.h"
 
 static const char *const kClassDocScanner = "com/salton123/writer/MmapWriter";
-
-static char *openMMap(int buffer_fd, size_t buffer_size);
-
-static void writeDirtyLogToFile(int buffer_fd);
 
 static AsyncFileFlush *fileFlush = nullptr;
 
