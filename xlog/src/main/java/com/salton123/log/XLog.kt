@@ -51,7 +51,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.v(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
     }
 
     @JvmStatic
@@ -63,7 +63,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.d(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
     }
 
     @JvmStatic
@@ -75,7 +75,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.i(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
     }
 
     @JvmStatic
@@ -87,7 +87,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.w(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
     }
 
     @JvmStatic
@@ -99,7 +99,7 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.e(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
+        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
     }
 
     /**
