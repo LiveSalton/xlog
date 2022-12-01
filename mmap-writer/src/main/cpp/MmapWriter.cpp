@@ -11,10 +11,13 @@ static const char *const kClassDocScanner = "com/salton123/writer/MmapWriter";
 
 static AsyncFileFlush *fileFlush = nullptr;
 
-static jlong createInstance(JNIEnv *env, jclass type, jstring buffer_path_,
-                            jint capacity, jstring log_path_, jboolean compress_) {
-    const char *buffer_path = env->GetStringUTFChars(buffer_path_, 0);
-    const char *log_path = env->GetStringUTFChars(log_path_, 0);
+static jlong createInstance(JNIEnv *env, jclass type, jstring save_path, jint capacity, jboolean compress_) {
+
+    const char *savePath = env->GetStringUTFChars(save_path, 0);
+    const char *bufferPrefix = "_buf";
+    char *buffer_path = (char *) malloc((strlen(savePath) + strlen(bufferPrefix)) * sizeof(char));
+    strcpy(buffer_path, savePath);
+    strcat(buffer_path, bufferPrefix);
     size_t buffer_size = static_cast<size_t>(capacity);
     int buffer_fd = open(buffer_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     // buffer 的第一个字节会用于存储日志路径名称长度，后面紧跟日志路径，之后才是日志信息
@@ -22,7 +25,7 @@ static jlong createInstance(JNIEnv *env, jclass type, jstring buffer_path_,
         fileFlush = new AsyncFileFlush();
     }
     // 加上头占用的大小
-    buffer_size = buffer_size + LogBufferHeader::calculateHeaderLen(strlen(log_path));
+    buffer_size = buffer_size + LogBufferHeader::calculateHeaderLen(strlen(savePath));
     char *buffer_ptr = openMMap(buffer_fd, buffer_size);
     bool map_buffer = true;
     //如果打开 mmap 失败，则降级使用内存缓存
@@ -33,11 +36,10 @@ static jlong createInstance(JNIEnv *env, jclass type, jstring buffer_path_,
     LogBuffer *logBuffer = new LogBuffer(buffer_ptr, buffer_size);
     logBuffer->setAsyncFileFlush(fileFlush);
     //将buffer内的数据清0， 并写入日志文件路径
-    logBuffer->initData((char *) log_path, strlen(log_path), compress_);
+    logBuffer->initData((char *) savePath, strlen(savePath), compress_);
     logBuffer->map_buffer = map_buffer;
 
-    env->ReleaseStringUTFChars(buffer_path_, buffer_path);
-    env->ReleaseStringUTFChars(log_path_, log_path);
+    env->ReleaseStringUTFChars(save_path, savePath);
     return reinterpret_cast<long>(logBuffer);
 }
 
@@ -112,11 +114,12 @@ static void flushInfo(JNIEnv *env, jobject instance, jlong ptr) {
     logBuffer->async_flush(fileFlush);
 }
 
+//static jlong createInstance(JNIEnv *env, jclass type, jstring save_path, jint capacity, jboolean compress_) {
 static JNINativeMethod gMethods[] = {
 
         {
                 "createInstance",
-                "(Ljava/lang/String;ILjava/lang/String;Z)J",
+                "(Ljava/lang/String;IZ)J",
                 (void *) createInstance
         },
 

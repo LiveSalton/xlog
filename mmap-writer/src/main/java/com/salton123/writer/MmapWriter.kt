@@ -17,7 +17,7 @@ object MmapWriter {
      * @param compress 是否用zlib压缩
      * @return mmap指针
      */
-    external fun createInstance(savePath: String, capacity: Int, logPath: String, compress: Boolean): Long
+    external fun createInstance(savePath: String, capacity: Int, compress: Boolean): Long
 
     /**
      * 写入内容

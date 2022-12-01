@@ -102,7 +102,7 @@ class FilePrinter(val config: XLogConfig) : Printer {
                 }
             }
             try {
-                mmapPointer = MmapWriter.createInstance(file.absolutePath, 8192 * 2, file.absolutePath, false)
+                mmapPointer = MmapWriter.createInstance(file.absolutePath, 8192 * 2,false)
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 config.callback?.invoke(-2, ex.message.toString())
