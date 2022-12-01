@@ -102,7 +102,7 @@ class FilePrinter(val config: XLogConfig) : Printer {
                 }
             }
             try {
-                mmapPointer = MmapWriter.create(file.absolutePath, 8192 * 2, false)
+                mmapPointer = MmapWriter.createInstance(file.absolutePath, 8192 * 2, file.absolutePath, false)
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 config.callback?.invoke(-2, ex.message.toString())
@@ -113,7 +113,7 @@ class FilePrinter(val config: XLogConfig) : Printer {
 
         fun close() {
             try {
-                MmapWriter.destory(mmapPointer)
+                MmapWriter.releaseInstance(mmapPointer)
                 mmapPointer = 0L
             } catch (ex: Exception) {
                 ex.printStackTrace()
@@ -123,8 +123,8 @@ class FilePrinter(val config: XLogConfig) : Printer {
 
         fun append(logInfo: String) {
             try {
-                MmapWriter.write(mmapPointer, logInfo)
-                MmapWriter.flush(mmapPointer)
+                MmapWriter.writeInfo(mmapPointer, logInfo)
+                MmapWriter.flushInfo(mmapPointer)
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 config.callback?.invoke(-4, ex.message.toString())

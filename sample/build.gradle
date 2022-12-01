@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'com.salton123.plugin.codecheck-gradle'
 android {
+    ndkVersion '21.4.7075529'
     compileSdk "${rootProject.ext.android.compileSdkVersion}" as Integer
     defaultConfig {
         minSdk rootProject.ext.android.minSdkVersion as Integer

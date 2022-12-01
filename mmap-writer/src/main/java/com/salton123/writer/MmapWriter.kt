@@ -17,20 +17,25 @@ object MmapWriter {
      * @param compress 是否用zlib压缩
      * @return mmap指针
      */
-    external fun create(savePath: String, capacity: Int, compress: Boolean): Long
+    external fun createInstance(savePath: String, capacity: Int, logPath: String, compress: Boolean): Long
 
     /**
      * 写入内容
      */
-    external fun write(bufferPointer: Long, info: String)
+    external fun writeInfo(bufferPointer: Long, info: String)
 
     /**
      * 异步写入内容到文件中
      */
-    external fun flush(bufferPointer: Long)
+    external fun flushInfo(bufferPointer: Long)
+
+    /**
+     *
+     */
+    external fun changePath(bufferPointer: Long, logPath: String)
 
     /**
      * 销毁mmap对象
      */
-    external fun destory(bufferPointer: Long)
+    external fun releaseInstance(bufferPointer: Long)
 }

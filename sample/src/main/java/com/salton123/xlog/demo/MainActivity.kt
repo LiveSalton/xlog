@@ -82,9 +82,9 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
 
     private fun testMmapWriter() {
         for (i in 1..10) {
-            val pointer = MmapWriter.create(defaultPath + File.separator + i + ".txt", 1024, false)
-            MmapWriter.write(pointer, "hello")
-            MmapWriter.flush(pointer)
+            val pointer = MmapWriter.createInstance(defaultPath + File.separator + i + ".mmap", 1024, defaultPath + File.separator + i + ".txt",false)
+            MmapWriter.writeInfo(pointer, "hello")
+            MmapWriter.flushInfo(pointer)
             //因为是异步写入，所以立即调用destroy存在写入不到数据的问题
 //            MmapWriter.destory(pointer)
         }
