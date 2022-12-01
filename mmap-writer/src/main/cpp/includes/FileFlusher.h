@@ -11,22 +11,22 @@
 #include <mutex>
 #include <condition_variable>
 #include <unistd.h>
-#include "FlushBuffer.h"
+#include "BufferFlusher.h"
 
-class AsyncFileFlush {
+class FileFlusher {
 
 public:
-    AsyncFileFlush();
-    ~AsyncFileFlush();
-    bool async_flush(FlushBuffer* flushBuffer);
+    FileFlusher();
+    ~FileFlusher();
+    bool async_flush(BufferFlusher* flushBuffer);
     void stopFlush();
 
 private:
     void async_log_thread();
-    ssize_t flush(FlushBuffer* flushBuffer);
+    ssize_t flush(BufferFlusher* flushBuffer);
 
     bool exit = false;
-    std::vector<FlushBuffer*> async_buffer;
+    std::vector<BufferFlusher*> async_buffer;
     std::thread async_thread;
     std::condition_variable async_condition;
     std::mutex async_mtx;

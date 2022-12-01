@@ -13,17 +13,17 @@
 #include<vector>
 #include <mutex>
 #include <condition_variable>
-#include "AsyncFileFlush.h"
-#include "FlushBuffer.h"
-#include "LogBufferHeader.h"
+#include "FileFlusher.h"
+#include "BufferFlusher.h"
+#include "MmapTrigger.h"
 #include <zlib.h>
 
 using namespace log_header;
 
-class LogBuffer {
+class MetaData {
 public:
-    LogBuffer(char* ptr, size_t capacity);
-    ~LogBuffer();
+    MetaData(char* ptr, size_t capacity);
+    ~MetaData();
 
     void initData(char *log_path, size_t log_path_len, bool is_compress);
     size_t length();
@@ -31,10 +31,10 @@ public:
     void release();
     size_t emptySize();
     char *getLogPath();
-    void setAsyncFileFlush(AsyncFileFlush *fileFlush);
+    void setAsyncFileFlush(FileFlusher *fileFlush);
     void async_flush();
-    void async_flush(AsyncFileFlush *fileFlush);
-    void async_flush(AsyncFileFlush *fileFlush, LogBuffer *releaseThis);
+    void async_flush(FileFlusher *fileFlush);
+    void async_flush(FileFlusher *fileFlush, MetaData *releaseThis);
     void changeLogPath(char *log_path);
 
 public:
@@ -47,7 +47,7 @@ private:
     bool openSetLogFile(const char *log_path);
 
     FILE* log_file = nullptr;
-    AsyncFileFlush *fileFlush = nullptr;
+    FileFlusher *fileFlush = nullptr;
     char* const buffer_ptr = nullptr;
     char* data_ptr = nullptr;
     char* write_ptr = nullptr;
@@ -55,7 +55,7 @@ private:
     size_t buffer_size = 0;
     std::recursive_mutex log_mtx;
 
-    LogBufferHeader logHeader;
+    MmapTrigger logHeader;
     z_stream zStream;
     bool is_compress = false;
 

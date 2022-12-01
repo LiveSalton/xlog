@@ -2,9 +2,9 @@
 // Created by pqpo on 2017/11/16.
 //
 
-#include "includes/LogBuffer.h"
+#include "includes/MetaData.h"
 
-LogBuffer::LogBuffer(char *ptr, size_t buffer_size):
+MetaData::MetaData(char *ptr, size_t buffer_size):
         buffer_ptr(ptr),
         buffer_size(buffer_size),
         logHeader(buffer_ptr, buffer_size) {
@@ -23,19 +23,19 @@ LogBuffer::LogBuffer(char *ptr, size_t buffer_size):
     memset(&zStream, 0, sizeof(zStream));
 }
 
-LogBuffer::~LogBuffer() {
+MetaData::~MetaData() {
     release();
 }
 
-size_t LogBuffer::length() {
+size_t MetaData::length() {
     return write_ptr - data_ptr;
 }
 
-void LogBuffer::setLength(size_t len) {
+void MetaData::setLength(size_t len) {
     logHeader.setLogLen(len);
 }
 
-size_t LogBuffer::append(const char *log, size_t len) {
+size_t MetaData::append(const char *log, size_t len) {
     std::lock_guard<std::recursive_mutex> lck_append(log_mtx);
 
     if (length() == 0) {
@@ -65,19 +65,19 @@ size_t LogBuffer::append(const char *log, size_t len) {
     return writeSize;
 }
 
-void LogBuffer::setAsyncFileFlush(AsyncFileFlush *_fileFlush) {
+void MetaData::setAsyncFileFlush(FileFlusher *_fileFlush) {
     fileFlush = _fileFlush;
 }
 
-void LogBuffer::async_flush() {
+void MetaData::async_flush() {
     async_flush(fileFlush);
 }
 
-void LogBuffer::async_flush(AsyncFileFlush *fileFlush) {
+void MetaData::async_flush(FileFlusher *fileFlush) {
     async_flush(fileFlush, nullptr);
 }
 
-void LogBuffer::async_flush(AsyncFileFlush *fileFlush, LogBuffer *releaseThis) {
+void MetaData::async_flush(FileFlusher *fileFlush, MetaData *releaseThis) {
     if(fileFlush == nullptr) {
         if (releaseThis != nullptr) {
             delete releaseThis;
@@ -89,7 +89,7 @@ void LogBuffer::async_flush(AsyncFileFlush *fileFlush, LogBuffer *releaseThis) {
         if (is_compress && Z_NULL != zStream.state) {
             deflateEnd(&zStream);
         }
-        FlushBuffer* flushBuffer = new FlushBuffer(log_file);
+        BufferFlusher* flushBuffer = new BufferFlusher(log_file);
         flushBuffer->write(data_ptr, length());
         flushBuffer->releaseThis(releaseThis);
         clear();
@@ -99,14 +99,14 @@ void LogBuffer::async_flush(AsyncFileFlush *fileFlush, LogBuffer *releaseThis) {
     }
 }
 
-void LogBuffer::clear() {
+void MetaData::clear() {
     std::lock_guard<std::recursive_mutex> lck_clear(log_mtx);
     write_ptr = data_ptr;
     memset(write_ptr, '\0', emptySize());
     setLength(length());
 }
 
-void LogBuffer::release() {
+void MetaData::release() {
     std::lock_guard<std::recursive_mutex> lck_release(log_mtx);
     if (is_compress && Z_NULL != zStream.state) {
         deflateEnd(&zStream);
@@ -121,11 +121,11 @@ void LogBuffer::release() {
     }
 }
 
-size_t LogBuffer::emptySize() {
+size_t MetaData::emptySize() {
     return buffer_size - (write_ptr - buffer_ptr);
 }
 
-void LogBuffer::initData(char *log_path, size_t log_path_len, bool is_compress) {
+void MetaData::initData(char *log_path, size_t log_path_len, bool is_compress) {
     std::lock_guard<std::recursive_mutex> lck_release(log_mtx);
     memset(buffer_ptr, '\0', buffer_size);
 
@@ -145,11 +145,11 @@ void LogBuffer::initData(char *log_path, size_t log_path_len, bool is_compress) 
     openSetLogFile(log_path);
 }
 
-char *LogBuffer::getLogPath() {
+char *MetaData::getLogPath() {
     return logHeader.getLogPath();
 }
 
-bool LogBuffer::initCompress(bool compress) {
+bool MetaData::initCompress(bool compress) {
     is_compress = compress;
     if (is_compress) {
         zStream.zalloc = Z_NULL;
@@ -160,7 +160,7 @@ bool LogBuffer::initCompress(bool compress) {
     return false;
 }
 
-bool LogBuffer::openSetLogFile(const char *log_path) {
+bool MetaData::openSetLogFile(const char *log_path) {
     if (log_path != nullptr) {
         FILE* _file_log = fopen(log_path, "ab+");
         if(_file_log != NULL) {
@@ -171,7 +171,7 @@ bool LogBuffer::openSetLogFile(const char *log_path) {
     return false;
 }
 
-void LogBuffer::changeLogPath(char *log_path) {
+void MetaData::changeLogPath(char *log_path) {
     if(log_file != nullptr) {
         async_flush();
     }

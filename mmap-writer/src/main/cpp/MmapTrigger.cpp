@@ -3,7 +3,7 @@
 //
 
 #include <ctime>
-#include "LogBufferHeader.h"
+#include "MmapTrigger.h"
 
 using namespace log_header;
 
@@ -15,17 +15,17 @@ using namespace log_header;
 //    char isCompress;
 //};
 
-LogBufferHeader::LogBufferHeader(void *data, size_t size) : data_ptr((char *) data), data_size(size) {
+MmapTrigger::MmapTrigger(void *data, size_t size) : data_ptr((char *) data), data_size(size) {
 }
 
-LogBufferHeader::~LogBufferHeader() {
+MmapTrigger::~MmapTrigger() {
 }
 
-void *LogBufferHeader::originPtr() {
+void *MmapTrigger::originPtr() {
     return data_ptr;
 }
 
-Header* LogBufferHeader::getHeader() {
+Header* MmapTrigger::getHeader() {
     Header* header = new Header();
     if (isAvailable()) {
         header->magic = kMagicHeader;
@@ -45,22 +45,22 @@ Header* LogBufferHeader::getHeader() {
     return header;
 }
 
-size_t LogBufferHeader::getHeaderLen() {
+size_t MmapTrigger::getHeaderLen() {
     if (isAvailable()) {
         return calculateHeaderLen(getLogPathLen());
     }
     return 0;
 }
 
-void *LogBufferHeader::ptr() {
+void *MmapTrigger::ptr() {
     return data_ptr + getHeaderLen();
 }
 
-void *LogBufferHeader::write_ptr() {
+void *MmapTrigger::write_ptr() {
     return data_ptr + getHeaderLen() + getLogLen();
 }
 
-void LogBufferHeader::initHeader(Header &header) {
+void MmapTrigger::initHeader(Header &header) {
     if ((sizeof(char) + sizeof(size_t) + sizeof(size_t) + header.log_path_len) > data_size) {
         return;
     }
@@ -77,7 +77,7 @@ void LogBufferHeader::initHeader(Header &header) {
 
 }
 
-size_t LogBufferHeader::getLogLen() {
+size_t MmapTrigger::getLogLen() {
     if (isAvailable()) {
         size_t log_len = 0;
         memcpy(&log_len, data_ptr + sizeof(char), sizeof(size_t));
@@ -90,7 +90,7 @@ size_t LogBufferHeader::getLogLen() {
     return 0;
 }
 
-size_t LogBufferHeader::getLogPathLen() {
+size_t MmapTrigger::getLogPathLen() {
     if (isAvailable()) {
         size_t log_path_len = 0;
         memcpy(&log_path_len, data_ptr + sizeof(char) + sizeof(size_t), sizeof(size_t));
@@ -103,7 +103,7 @@ size_t LogBufferHeader::getLogPathLen() {
     return 0;
 }
 
-char *LogBufferHeader::getLogPath() {
+char *MmapTrigger::getLogPath() {
     if (isAvailable()) {
         size_t log_path_len = getLogPathLen();
         if (log_path_len > 0) {
@@ -116,17 +116,17 @@ char *LogBufferHeader::getLogPath() {
     return nullptr;
 }
 
-void LogBufferHeader::setLogLen(size_t log_len) {
+void MmapTrigger::setLogLen(size_t log_len) {
     if (isAvailable()) {
         memcpy(data_ptr + sizeof(char), &log_len, sizeof(size_t));
     }
 }
 
-bool LogBufferHeader::isAvailable() {
+bool MmapTrigger::isAvailable() {
     return data_ptr[0] == kMagicHeader;
 }
 
-bool LogBufferHeader::getIsCompress() {
+bool MmapTrigger::getIsCompress() {
     if (isAvailable()) {
         char isCompress = (data_ptr + sizeof(char) + sizeof(size_t) + sizeof(size_t) + getLogPathLen())[0];
         return isCompress == 1;
@@ -134,7 +134,7 @@ bool LogBufferHeader::getIsCompress() {
     return false;
 }
 
-size_t LogBufferHeader::calculateHeaderLen(size_t log_path_len) {
+size_t MmapTrigger::calculateHeaderLen(size_t log_path_len) {
     return sizeof(char) + sizeof(size_t) + sizeof(size_t) + log_path_len + sizeof(char);
 }
 

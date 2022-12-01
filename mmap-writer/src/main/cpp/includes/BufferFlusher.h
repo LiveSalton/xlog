@@ -10,11 +10,11 @@
 #include <math.h>
 #include <stdio.h>
 
-class FlushBuffer {
+class BufferFlusher {
 
     public:
-        FlushBuffer(FILE* log_file, size_t size = 128);
-        ~FlushBuffer();
+        BufferFlusher(FILE* log_file, size_t size = 128);
+        ~BufferFlusher();
         void write(void* data, size_t len);
         void reset();
         size_t length();

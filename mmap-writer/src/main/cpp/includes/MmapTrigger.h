@@ -18,11 +18,11 @@ namespace log_header{
         bool isCompress;
     };
 
-    class LogBufferHeader {
+    class MmapTrigger {
 
     public:
-        LogBufferHeader(void* data, size_t size);
-        ~LogBufferHeader();
+        MmapTrigger(void* data, size_t size);
+        ~MmapTrigger();
         void initHeader(Header& header);
         void* originPtr();
         void* ptr();
