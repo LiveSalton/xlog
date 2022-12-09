@@ -14,9 +14,6 @@ class LogConfig {
 
     var isDebugable: Boolean = true
         private set
-
-    var whetherToSaveLog: Boolean = true
-        private set
     var savePath: String = ""
         private set
     var logDeleteDelayDay: Int = 10
@@ -27,6 +24,7 @@ class LogConfig {
         private set
     var prefix = "salton"
         private set
+
 
     fun setDebugable(debugable: Boolean): LogConfig {
         isDebugable = debugable
@@ -40,11 +38,6 @@ class LogConfig {
 
     fun setPrefix(prefix: String): LogConfig {
         this.prefix = prefix
-        return this
-    }
-
-    fun setWhetherToSaveLog(whetherToSaveLog: Boolean): LogConfig {
-        this.whetherToSaveLog = whetherToSaveLog
         return this
     }
 

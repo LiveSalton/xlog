@@ -20,23 +20,31 @@ object XLog {
         }
     }
 
-    var mmapPointer: Long = 0
-    val xlog = Xlog()
-
     @JvmStatic
     fun config(config: LogConfig) {
         sConfig = config
-        val logConfig = Xlog.XLogConfig()
-        logConfig.level = Xlog.LEVEL_ALL
-        logConfig.mode = Xlog.AppednerModeAsync
-        logConfig.logdir = config.savePath
-        logConfig.nameprefix = config.prefix
-        logConfig.pubkey = ""
-        logConfig.compressmode = Xlog.ZLIB_MODE
-        logConfig.compresslevel = 0
-        logConfig.cachedir = config.savePath
-        logConfig.cachedays = config.logDeleteDelayDay
-        mmapPointer = xlog.newXlogInstance(logConfig)
+        var appendMode = Xlog.AppednerModeAsync
+        var level = Xlog.LEVEL_ALL
+        if (sConfig.isDebugable) {
+            Xlog.setConsoleLogOpen(true)
+            appendMode = Xlog.AppednerModeSync
+            level = Xlog.LEVEL_INFO
+        }
+        Xlog.setMaxFileSize(maxFileSize())
+        Xlog.setMaxAliveTime(maxAliveTime())
+        Xlog.appenderOpen(level, appendMode,
+            sConfig.savePath, sConfig.savePath,
+            sConfig.prefix, sConfig.logDeleteDelayDay, ""
+        )
+        Log.i("salton", "init xlog:$sConfig")
+    }
+
+    fun maxFileSize(): Long {
+        return (sConfig.logDefaultSplitSize * 1024 * 1024).toLong()
+    }
+
+    fun maxAliveTime(): Long {
+        return (sConfig.logDeleteDelayDay * 24 * 60 * 60).toLong()
     }
 
     /**
@@ -51,7 +59,11 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.v(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        try {
+            Xlog.logWrite2(Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+        }
     }
 
     @JvmStatic
@@ -63,7 +75,11 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.d(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        try {
+            Xlog.logWrite2(Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+        }
     }
 
     @JvmStatic
@@ -75,7 +91,11 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.i(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        try {
+            Xlog.logWrite2(Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+        }
     }
 
     @JvmStatic
@@ -87,7 +107,11 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.w(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        try {
+            Xlog.logWrite2(Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+        }
     }
 
     @JvmStatic
@@ -99,7 +123,11 @@ object XLog {
         if (sConfig.isDebugable) {
             Log.e(objClassName(tag), logText)
         }
-        Xlog.logWrite2(mmapPointer, Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        try {
+            Xlog.logWrite2(Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+        } catch (throwable: Throwable) {
+            throwable.printStackTrace()
+        }
     }
 
     /**

@@ -23,7 +23,6 @@ public class XLogSampleApplication extends Application {
         super.onCreate();
         XLog.config(new LogConfig()
             .setDebugable(BuildConfig.DEBUG) //whether print info to logcat
-            .setWhetherToSaveLog(true)  //whether save log to file
             .setLogDefaultSplitSize(5)  //split log size , unit m
             .setSavePath(Utils.getDefaultPath() + getPackageName()) //log save path
             .setLogDeleteDelayDay(10)   //log delete delay day

@@ -20,5 +20,5 @@ android {
 dependencies {
 //    api project(":mmap-writer")
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.2.71"
-    implementation 'com.tencent.mars:mars-xlog:+'
+    implementation 'com.tencent.mars:mars-xlog:1.2.3'
 }
