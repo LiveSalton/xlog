@@ -60,7 +60,7 @@ object XLog {
             Log.v(objClassName(tag), logText)
         }
         try {
-            Xlog.logWrite2(Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_VERBOSE, "", "", "", 0, 0, 0, 0, logText)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -76,7 +76,7 @@ object XLog {
             Log.d(objClassName(tag), logText)
         }
         try {
-            Xlog.logWrite2(Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_DEBUG, "", "", "", 0, 0, 0, 0, logText)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -92,7 +92,7 @@ object XLog {
             Log.i(objClassName(tag), logText)
         }
         try {
-            Xlog.logWrite2(Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_INFO, "", "", "", 0, 0, 0, 0, logText)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -108,7 +108,7 @@ object XLog {
             Log.w(objClassName(tag), logText)
         }
         try {
-            Xlog.logWrite2(Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_WARNING, "", "", "", 0, 0, 0, 0, logText)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -124,7 +124,7 @@ object XLog {
             Log.e(objClassName(tag), logText)
         }
         try {
-            Xlog.logWrite2(Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_ERROR, "", "", "", 0, 0, 0, 0, logText)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
