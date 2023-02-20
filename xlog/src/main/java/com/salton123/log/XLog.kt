@@ -9,7 +9,7 @@ import com.tencent.mars.xlog.Xlog
  * Description:
  */
 object XLog {
-    private var sConfig = LogConfig()
+    open var sConfig = LogConfig()
 
     init {
         try {
