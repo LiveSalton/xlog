@@ -32,7 +32,8 @@ object XLog {
         }
         Xlog.setMaxFileSize(maxFileSize())
         Xlog.setMaxAliveTime(maxAliveTime())
-        Xlog.appenderOpen(level, appendMode,
+        Xlog.appenderOpen(
+            level, appendMode,
             sConfig.savePath, sConfig.savePath,
             sConfig.prefix, sConfig.logDeleteDelayDay, ""
         )
@@ -55,12 +56,10 @@ object XLog {
         val line = Utils.callerLineNumber
         val fileName = Utils.callerFilename
         val methodName = Utils.callerMethodName
-        val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
-        if (sConfig.isDebugable) {
-            Log.v(objClassName(tag), logText)
-        }
+        val logText = Utils.msgForTextLog(objClassName(tag), fileName, line, msg, methodName)
         try {
-            Xlog.logWrite2(Xlog.LEVEL_VERBOSE, "", "", "", 0, 0, 0, 0, logText)
+//            Xlog.logWrite2(Xlog.LEVEL_VERBOSE, "", "", "", 0, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_VERBOSE, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -71,12 +70,10 @@ object XLog {
         val line = Utils.callerLineNumber
         val fileName = Utils.callerFilename
         val methodName = Utils.callerMethodName
-        val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
-        if (sConfig.isDebugable) {
-            Log.d(objClassName(tag), logText)
-        }
+        val logText = Utils.msgForTextLog(objClassName(tag), fileName, line, msg, methodName)
         try {
-            Xlog.logWrite2(Xlog.LEVEL_DEBUG, "", "", "", 0, 0, 0, 0, logText)
+//            Xlog.logWrite2(Xlog.LEVEL_DEBUG, "", "", "", 0, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_DEBUG, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -87,12 +84,10 @@ object XLog {
         val line = Utils.callerLineNumber
         val fileName = Utils.callerFilename
         val methodName = Utils.callerMethodName
-        val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
-        if (sConfig.isDebugable) {
-            Log.i(objClassName(tag), logText)
-        }
+        val logText = Utils.msgForTextLog(objClassName(tag), fileName, line, msg, methodName)
         try {
-            Xlog.logWrite2(Xlog.LEVEL_INFO, "", "", "", 0, 0, 0, 0, logText)
+//            Xlog.logWrite2(Xlog.LEVEL_INFO, "", "", "", 0, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_INFO, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -103,12 +98,10 @@ object XLog {
         val line = Utils.callerLineNumber
         val fileName = Utils.callerFilename
         val methodName = Utils.callerMethodName
-        val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
-        if (sConfig.isDebugable) {
-            Log.w(objClassName(tag), logText)
-        }
+        val logText = Utils.msgForTextLog(objClassName(tag), fileName, line, msg, methodName)
         try {
-            Xlog.logWrite2(Xlog.LEVEL_WARNING, "", "", "", 0, 0, 0, 0, logText)
+//            Xlog.logWrite2(Xlog.LEVEL_WARNING, "", "", "", 0, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_WARNING, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -119,12 +112,10 @@ object XLog {
         val line = Utils.callerLineNumber
         val fileName = Utils.callerFilename
         val methodName = Utils.callerMethodName
-        val logText = Utils.msgForTextLog(tag, fileName, line, msg, methodName)
-        if (sConfig.isDebugable) {
-            Log.e(objClassName(tag), logText)
-        }
+        val logText = Utils.msgForTextLog(objClassName(tag), fileName, line, msg, methodName)
         try {
-            Xlog.logWrite2(Xlog.LEVEL_ERROR, "", "", "", 0, 0, 0, 0, logText)
+//            Xlog.logWrite2(Xlog.LEVEL_ERROR, "", "", "", 0, 0, 0, 0, logText)
+            Xlog.logWrite2(Xlog.LEVEL_ERROR, objClassName(tag), fileName, methodName, line, 0, 0, 0, msg)
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
         }
@@ -133,7 +124,7 @@ object XLog {
     /**
      * Returns the obj`s classname
      */
-    private fun objClassName(obj: Any): String? {
+    private fun objClassName(obj: Any): String {
         return if (obj is String) {
             sConfig.prefix + "-" + obj
         } else {

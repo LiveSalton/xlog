@@ -36,16 +36,17 @@ class MainActivity : AppCompatActivity(), PermissionsUtil.IPermissionsCallback {
         index = sharedPreferences.getLong("index", 0)
         tvEffectiveWrite.setOnClickListener {
             if (!isStartWrite) {
-                Thread {
-                    while (true) {
-                        XLog.i("MainActivity", "hello ${index++}")
-                        XLog.w("MainActivity", "hello ${index++}")
-                        XLog.e("MainActivity", "hello ${index++}")
-                        XLog.v("MainActivity", "hello ${index++}")
-                        XLog.d("MainActivity", "hello ${index++}")
-                        Thread.sleep(100)
-                    }
-                }.start()
+                XLog.i("MainActivity", "hello ${index++}")
+//                Thread {
+//                    while (true) {
+//                        XLog.i("MainActivity", "hello ${index++}")
+//                        XLog.w("MainActivity", "hello ${index++}")
+//                        XLog.e("MainActivity", "hello ${index++}")
+//                        XLog.v("MainActivity", "hello ${index++}")
+//                        XLog.d("MainActivity", "hello ${index++}")
+//                        Thread.sleep(100)
+//                    }
+//                }.start()
                 isStartWrite = true;
             } else {
                 val sharedPreferences = getSharedPreferences("test", Context.MODE_PRIVATE)
