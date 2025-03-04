@@ -6,10 +6,10 @@ mavenPublish {
         repositories {
             maven {
                 credentials {
-                    username '6XCT1E'
-                    password 'XldVM4G6IO'
+                    username '60e6b7fe3c458713ddbf2d80'
+                    password 'VMuNtiaI9Ygh'
                 }
-                url 'https://repo.rdc.aliyun.com/repository/43441-release-5ZHLZs/'
+                url 'https://packages.aliyun.com/60e6b812f00dfa2fa4cac307/maven/2119527-release-1nbpdv'
             }
         }
     }
